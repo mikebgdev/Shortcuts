@@ -11,12 +11,25 @@ export const shortcuts = pgTable("shortcuts", {
   platform: varchar("platform", { length: 20 }).notNull(),
 });
 
+export const favorites = pgTable("favorites", {
+  id: serial("id").primaryKey(),
+  shortcutId: serial("shortcut_id").notNull(),
+  userId: serial("user_id").notNull(),
+});
+
 export const insertShortcutSchema = createInsertSchema(shortcuts).omit({
   id: true,
 });
 
 export type InsertShortcut = z.infer<typeof insertShortcutSchema>;
 export type Shortcut = typeof shortcuts.$inferSelect;
+
+export const insertFavoriteSchema = createInsertSchema(favorites).omit({
+  id: true,
+});
+
+export type InsertFavorite = z.infer<typeof insertFavoriteSchema>;
+export type Favorite = typeof favorites.$inferSelect;
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),

@@ -1,4 +1,4 @@
-import { shortcuts, users, type Shortcut, type InsertShortcut, type User, type InsertUser } from "@shared/schema";
+import { shortcuts, users, favorites, type Shortcut, type InsertShortcut, type User, type InsertUser, type Favorite, type InsertFavorite } from "@shared/schema";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -10,19 +10,28 @@ export interface IStorage {
   getShortcutsByCategory(category: string): Promise<Shortcut[]>;
   searchShortcuts(query: string): Promise<Shortcut[]>;
   createShortcut(shortcut: InsertShortcut): Promise<Shortcut>;
+  
+  getFavorites(userId: number): Promise<number[]>;
+  addFavorite(userId: number, shortcutId: number): Promise<Favorite>;
+  removeFavorite(userId: number, shortcutId: number): Promise<void>;
+  isFavorite(userId: number, shortcutId: number): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
   private users: Map<number, User>;
   private shortcuts: Map<number, Shortcut>;
+  private favorites: Map<string, Favorite>;
   private currentUserId: number;
   private currentShortcutId: number;
+  private currentFavoriteId: number;
 
   constructor() {
     this.users = new Map();
     this.shortcuts = new Map();
+    this.favorites = new Map();
     this.currentUserId = 1;
     this.currentShortcutId = 1;
+    this.currentFavoriteId = 1;
     this.initializeShortcuts();
   }
 
@@ -719,6 +728,30 @@ export class MemStorage implements IStorage {
     const shortcut: Shortcut = { ...insertShortcut, id };
     this.shortcuts.set(id, shortcut);
     return shortcut;
+  }
+
+  async getFavorites(userId: number): Promise<number[]> {
+    return Array.from(this.favorites.values())
+      .filter(fav => fav.userId === userId)
+      .map(fav => fav.shortcutId);
+  }
+
+  async addFavorite(userId: number, shortcutId: number): Promise<Favorite> {
+    const key = `${userId}-${shortcutId}`;
+    const id = this.currentFavoriteId++;
+    const favorite: Favorite = { id, userId, shortcutId };
+    this.favorites.set(key, favorite);
+    return favorite;
+  }
+
+  async removeFavorite(userId: number, shortcutId: number): Promise<void> {
+    const key = `${userId}-${shortcutId}`;
+    this.favorites.delete(key);
+  }
+
+  async isFavorite(userId: number, shortcutId: number): Promise<boolean> {
+    const key = `${userId}-${shortcutId}`;
+    return this.favorites.has(key);
   }
 }
 
