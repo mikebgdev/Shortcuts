@@ -1,8 +1,9 @@
 import { useState } from "react";
 import type { Shortcut } from "@shared/schema";
 import { Button } from "@/components/ui/button";
-import { Copy, Check } from "lucide-react";
+import { Copy, Check, Heart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useFavorites } from "@/contexts/FavoritesContext";
 
 interface ShortcutCardProps {
   shortcut: Shortcut;
@@ -13,6 +14,7 @@ interface ShortcutCardProps {
 export default function ShortcutCard({ shortcut, categoryColor, searchTerm }: ShortcutCardProps) {
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
+  const { isFavorite, toggleFavorite } = useFavorites();
 
   const handleCopy = async () => {
     try {
@@ -74,19 +76,33 @@ export default function ShortcutCard({ shortcut, categoryColor, searchTerm }: Sh
   };
 
   return (
-    <div className="bg-white rounded-lg border border-slate-200 p-4 hover:shadow-md transition-shadow">
+    <div className="bg-white dark:bg-gray-800 rounded-lg border border-slate-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow">
       <div className="flex items-center justify-between mb-2">
-        <h3 className="font-semibold text-slate-900">
+        <h3 className="font-semibold text-slate-900 dark:text-white">
           {highlightText(shortcut.title, searchTerm)}
         </h3>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleCopy}
-          className="text-slate-400 hover:text-primary p-1 h-auto"
-        >
-          {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-        </Button>
+        <div className="flex items-center space-x-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => toggleFavorite(shortcut.id)}
+            className={`p-1 h-auto ${
+              isFavorite(shortcut.id) 
+                ? 'text-red-500 hover:text-red-600' 
+                : 'text-slate-400 dark:text-gray-400 hover:text-red-500'
+            }`}
+          >
+            <Heart className={`h-4 w-4 ${isFavorite(shortcut.id) ? 'fill-current' : ''}`} />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleCopy}
+            className="text-slate-400 dark:text-gray-400 hover:text-primary p-1 h-auto"
+          >
+            {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+          </Button>
+        </div>
       </div>
 
       {renderShortcut(shortcut.shortcut)}
