@@ -833,7 +833,7 @@ export class MemStorage implements IStorage {
 
   async createUserNote(note: InsertUserNote): Promise<UserNote> {
     const id = this.currentUserNoteId++;
-    const userNote: UserNote = { ...note, id };
+    const userNote: UserNote = { id, userId: note.userId, shortcutId: note.shortcutId, note: note.note };
     const key = `${note.userId}-${note.shortcutId}`;
     this.userNotes.set(key, userNote);
     return userNote;
@@ -859,7 +859,7 @@ export class MemStorage implements IStorage {
 
   async createTag(tag: InsertTag): Promise<Tag> {
     const id = this.currentTagId++;
-    const newTag: Tag = { ...tag, id };
+    const newTag: Tag = { id, name: tag.name, color: tag.color };
     this.tags.set(id, newTag);
     return newTag;
   }
@@ -904,7 +904,14 @@ export class MemStorage implements IStorage {
   // Quiz Sessions
   async createQuizSession(session: InsertQuizSession): Promise<QuizSession> {
     const id = this.currentQuizSessionId++;
-    const quizSession: QuizSession = { ...session, id };
+    const quizSession: QuizSession = { 
+      id, 
+      userId: session.userId, 
+      platform: session.platform, 
+      score: session.score, 
+      totalQuestions: session.totalQuestions, 
+      completedAt: session.completedAt 
+    };
     this.quizSessions.set(id, quizSession);
     return quizSession;
   }

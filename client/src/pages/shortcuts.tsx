@@ -4,9 +4,12 @@ import type { Shortcut } from "@shared/schema";
 import SearchHeader from "@/components/search-header";
 import PlatformSidebar from "@/components/platform-sidebar";
 import ShortcutCard from "@/components/shortcut-card";
+import EnhancedShortcutCard from "@/components/enhanced-shortcut-card";
 import { Button } from "@/components/ui/button";
-import { Heart } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Heart, Brain, LayoutGrid, LayoutList, Settings } from "lucide-react";
 import { useFavorites } from "@/contexts/FavoritesContext";
+import { Link } from "wouter";
 
 const PLATFORMS = [
   { id: "phpstorm", name: "PHPStorm", icon: "fab fa-php" },
