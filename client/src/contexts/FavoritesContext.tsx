@@ -31,7 +31,25 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
       if (!response.ok) throw new Error('Failed to add favorite');
       return response.json();
     },
-    onSuccess: () => {
+    onMutate: async (shortcutId) => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ['/api/favorites', CURRENT_USER_ID] });
+      
+      // Snapshot the previous value
+      const previousFavorites = queryClient.getQueryData(['/api/favorites', CURRENT_USER_ID]);
+      
+      // Optimistically update
+      queryClient.setQueryData(['/api/favorites', CURRENT_USER_ID], (old: number[] = []) => {
+        return old.includes(shortcutId) ? old : [...old, shortcutId];
+      });
+      
+      return { previousFavorites };
+    },
+    onError: (err, shortcutId, context) => {
+      // Rollback on error
+      queryClient.setQueryData(['/api/favorites', CURRENT_USER_ID], context?.previousFavorites);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/favorites', CURRENT_USER_ID] });
     },
   });
@@ -44,7 +62,25 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
       if (!response.ok) throw new Error('Failed to remove favorite');
       return response.json();
     },
-    onSuccess: () => {
+    onMutate: async (shortcutId) => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ['/api/favorites', CURRENT_USER_ID] });
+      
+      // Snapshot the previous value
+      const previousFavorites = queryClient.getQueryData(['/api/favorites', CURRENT_USER_ID]);
+      
+      // Optimistically update
+      queryClient.setQueryData(['/api/favorites', CURRENT_USER_ID], (old: number[] = []) => {
+        return old.filter(id => id !== shortcutId);
+      });
+      
+      return { previousFavorites };
+    },
+    onError: (err, shortcutId, context) => {
+      // Rollback on error
+      queryClient.setQueryData(['/api/favorites', CURRENT_USER_ID], context?.previousFavorites);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/favorites', CURRENT_USER_ID] });
     },
   });

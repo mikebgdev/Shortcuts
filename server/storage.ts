@@ -44,6 +44,7 @@ export class MemStorage implements IStorage {
       password: "demo"
     };
     this.users.set(1, defaultUser);
+    this.currentUserId = 2; // Start from 2 for new users
   }
 
   private initializeShortcuts() {
