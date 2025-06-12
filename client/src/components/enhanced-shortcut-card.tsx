@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -28,6 +28,11 @@ export default function EnhancedShortcutCard({ shortcut, categoryColor, searchTe
   const { toggleFavorite, isFavorite } = useFavorites();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Update expanded state when viewMode prop changes
+  useEffect(() => {
+    setIsExpanded(viewMode === 'expanded');
+  }, [viewMode]);
   const favorite = isFavorite(shortcut.id);
   const userId = 1; // Using demo user
 
@@ -175,7 +180,7 @@ export default function EnhancedShortcutCard({ shortcut, categoryColor, searchTe
   };
 
   return (
-    <Card className={`hover:shadow-lg transition-all duration-200 group border-l-4 ${isExpanded ? 'h-auto' : 'h-full'}`} 
+    <Card className={`hover:shadow-lg transition-all duration-200 group border-l-4 ${isExpanded ? 'bg-slate-50 dark:bg-gray-800/50' : ''}`} 
           style={{ borderLeftColor: categoryColor }}>
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
@@ -193,9 +198,11 @@ export default function EnhancedShortcutCard({ shortcut, categoryColor, searchTe
                 {highlightText(shortcut.title, searchTerm)}
               </CardTitle>
             </div>
-            <CardDescription className="text-sm ml-8">
-              {highlightText(shortcut.description, searchTerm)}
-            </CardDescription>
+            {!isExpanded && (
+              <CardDescription className="text-sm ml-8 truncate">
+                {highlightText(shortcut.description, searchTerm)}
+              </CardDescription>
+            )}
           </div>
           <div className="flex items-center gap-1 ml-2">
             <Dialog open={noteDialogOpen} onOpenChange={setNoteDialogOpen}>
@@ -357,14 +364,35 @@ export default function EnhancedShortcutCard({ shortcut, categoryColor, searchTe
             </div>
           )}
 
-          {/* User Note */}
-          {userNote && isExpanded && (
-            <div className="mt-3 p-2 bg-blue-50 dark:bg-blue-950/20 rounded border-l-2 border-blue-500">
-              <div className="flex items-center gap-2 mb-1">
-                <StickyNote className="h-4 w-4 text-blue-500" />
-                <span className="text-sm font-medium text-blue-700 dark:text-blue-300">Mi Nota</span>
+          {/* Expanded View Content */}
+          {isExpanded && (
+            <div className="mt-4 space-y-3 border-t pt-3">
+              {/* Description in expanded view */}
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                <span className="font-medium">Descripción: </span>
+                {highlightText(shortcut.description, searchTerm)}
               </div>
-              <p className="text-sm text-blue-600 dark:text-blue-400">{userNote.note}</p>
+              
+              {/* User Note */}
+              {userNote && (
+                <div className="p-3 bg-blue-50 dark:bg-blue-950/20 rounded border-l-4 border-blue-500">
+                  <div className="flex items-center gap-2 mb-2">
+                    <StickyNote className="h-4 w-4 text-blue-500" />
+                    <span className="text-sm font-medium text-blue-700 dark:text-blue-300">Mi Nota Personal</span>
+                  </div>
+                  <p className="text-sm text-blue-600 dark:text-blue-400">{userNote.note}</p>
+                </div>
+              )}
+              
+              {/* Usage Tips in expanded view */}
+              <div className="text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50 p-2 rounded">
+                <span className="font-medium">💡 Tip: </span>
+                {shortcut.category === 'navigation' && 'Usa este atajo para navegar más rápido por tu proyecto'}
+                {shortcut.category === 'editing' && 'Este atajo te ayudará a editar código más eficientemente'}
+                {shortcut.category === 'debugging' && 'Útil durante sesiones de debugging y resolución de problemas'}
+                {shortcut.category === 'system' && 'Comando del sistema para administración y monitoreo'}
+                {shortcut.category === 'window' && 'Gestiona ventanas y espacios de trabajo'}
+              </div>
             </div>
           )}
         </div>
