@@ -4,6 +4,9 @@ import type { Shortcut } from "@shared/schema";
 import SearchHeader from "@/components/search-header";
 import PlatformSidebar from "@/components/platform-sidebar";
 import ShortcutCard from "@/components/shortcut-card";
+import { Button } from "@/components/ui/button";
+import { Heart } from "lucide-react";
+import { useFavorites } from "@/contexts/FavoritesContext";
 
 const PLATFORMS = [
   { id: "phpstorm", name: "PHPStorm", icon: "fab fa-php" },
@@ -25,10 +28,13 @@ export default function ShortcutsPage() {
   const [activeCategories, setActiveCategories] = useState(
     CATEGORIES.map(cat => cat.id)
   );
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
 
   const { data: shortcuts = [], isLoading } = useQuery<Shortcut[]>({
     queryKey: ["/api/shortcuts"],
   });
+
+  const { favorites } = useFavorites();
 
   // Filter shortcuts based on current filters
   const filteredShortcuts = shortcuts.filter(shortcut => {
@@ -38,8 +44,9 @@ export default function ShortcutsPage() {
       shortcut.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       shortcut.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
       shortcut.shortcut.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFavorites = !showFavoritesOnly || favorites.includes(shortcut.id);
     
-    return matchesPlatform && matchesCategory && matchesSearch;
+    return matchesPlatform && matchesCategory && matchesSearch && matchesFavorites;
   });
 
   // Keyboard shortcut for search (Ctrl+K)
@@ -80,7 +87,7 @@ export default function ShortcutsPage() {
   const currentPlatform = PLATFORMS.find(p => p.id === activePlatform);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 dark:bg-gray-900">
       <SearchHeader 
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
@@ -99,12 +106,24 @@ export default function ShortcutsPage() {
           
           <div className="lg:col-span-3">
             <div className="mb-6">
-              <h2 className="text-2xl font-bold text-slate-900 mb-2">
-                {currentPlatform?.name} Shortcuts
-              </h2>
-              <p className="text-slate-600">
-                Essential keyboard shortcuts for efficient {currentPlatform?.name.toLowerCase()} usage
-              </p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+                    {currentPlatform?.name} Shortcuts
+                  </h2>
+                  <p className="text-slate-600 dark:text-gray-300">
+                    Essential keyboard shortcuts for efficient {currentPlatform?.name.toLowerCase()} usage
+                  </p>
+                </div>
+                <Button
+                  variant={showFavoritesOnly ? "default" : "outline"}
+                  onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+                  className="flex items-center space-x-2"
+                >
+                  <Heart className={`h-4 w-4 ${showFavoritesOnly ? 'fill-current' : ''}`} />
+                  <span>{showFavoritesOnly ? 'Show All' : 'Favorites Only'}</span>
+                </Button>
+              </div>
             </div>
 
             {isLoading ? (

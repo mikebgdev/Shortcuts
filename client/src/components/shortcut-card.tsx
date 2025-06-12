@@ -107,7 +107,7 @@ export default function ShortcutCard({ shortcut, categoryColor, searchTerm }: Sh
 
       {renderShortcut(shortcut.shortcut)}
 
-      <p className="text-sm text-slate-600 mb-3">
+      <p className="text-sm text-slate-600 dark:text-gray-300 mb-3">
         {highlightText(shortcut.description, searchTerm)}
       </p>
 
