@@ -3,11 +3,10 @@ import { useQuery } from "@tanstack/react-query";
 import type { Shortcut } from "@shared/schema";
 import SearchHeader from "@/components/search-header";
 import PlatformSidebar from "@/components/platform-sidebar";
-import ShortcutCard from "@/components/shortcut-card";
+
 import EnhancedShortcutCard from "@/components/enhanced-shortcut-card";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Heart, Brain, LayoutGrid, LayoutList, Settings } from "lucide-react";
+import { Heart, Brain } from "lucide-react";
 import { useFavorites } from "@/contexts/FavoritesContext";
 import { Link } from "wouter";
 
@@ -32,8 +31,7 @@ export default function ShortcutsPage() {
     CATEGORIES.map(cat => cat.id)
   );
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
-  const [viewMode, setViewMode] = useState<'compact' | 'expanded'>('compact');
-  const [useEnhanced, setUseEnhanced] = useState(true);
+
 
   const { data: shortcuts = [], isLoading } = useQuery<Shortcut[]>({
     queryKey: ["/api/shortcuts"],
@@ -138,44 +136,7 @@ export default function ShortcutsPage() {
                 </div>
               </div>
               
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <Settings className="h-4 w-4 text-gray-500" />
-                    <span className="text-sm text-gray-600 dark:text-gray-400">Vista:</span>
-                    <Select value={viewMode} onValueChange={(value: 'compact' | 'expanded') => setViewMode(value)}>
-                      <SelectTrigger className="w-32">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="compact">
-                          <div className="flex items-center gap-2">
-                            <LayoutGrid className="h-4 w-4" />
-                            Compacta
-                          </div>
-                        </SelectItem>
-                        <SelectItem value="expanded">
-                          <div className="flex items-center gap-2">
-                            <LayoutList className="h-4 w-4" />
-                            Expandida
-                          </div>
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">Mejorada:</span>
-                    <Button
-                      variant={useEnhanced ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setUseEnhanced(!useEnhanced)}
-                    >
-                      {useEnhanced ? 'Sí' : 'No'}
-                    </Button>
-                  </div>
-                </div>
-                
+              <div className="flex items-center justify-end">
                 <div className="text-sm text-gray-500">
                   {filteredShortcuts.length} shortcuts
                 </div>
@@ -194,18 +155,14 @@ export default function ShortcutsPage() {
               </div>
             ) : filteredShortcuts.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {filteredShortcuts.map(shortcut => {
-                  const CardComponent = useEnhanced ? EnhancedShortcutCard : ShortcutCard;
-                  return (
-                    <CardComponent
-                      key={shortcut.id}
-                      shortcut={shortcut}
-                      categoryColor={getCategoryColor(shortcut.category)}
-                      searchTerm={searchTerm}
-                      {...(useEnhanced ? { viewMode } : {})}
-                    />
-                  );
-                })}
+                {filteredShortcuts.map(shortcut => (
+                  <EnhancedShortcutCard
+                    key={shortcut.id}
+                    shortcut={shortcut}
+                    categoryColor={getCategoryColor(shortcut.category)}
+                    searchTerm={searchTerm}
+                  />
+                ))}
               </div>
             ) : (
               <div className="text-center py-12">
