@@ -19,8 +19,8 @@ export const favorites = pgTable("favorites", {
 
 export const userNotes = pgTable("user_notes", {
   id: serial("id").primaryKey(),
-  shortcutId: serial("shortcut_id").notNull(),
-  userId: serial("user_id").notNull(),
+  shortcutId: integer("shortcut_id").notNull(),
+  userId: integer("user_id").notNull(),
   note: text("note").notNull(),
 });
 
@@ -32,17 +32,17 @@ export const tags = pgTable("tags", {
 
 export const shortcutTags = pgTable("shortcut_tags", {
   id: serial("id").primaryKey(),
-  shortcutId: serial("shortcut_id").notNull(),
-  tagId: serial("tag_id").notNull(),
-  userId: serial("user_id").notNull(),
+  shortcutId: integer("shortcut_id").notNull(),
+  tagId: integer("tag_id").notNull(),
+  userId: integer("user_id").notNull(),
 });
 
 export const quizSessions = pgTable("quiz_sessions", {
   id: serial("id").primaryKey(),
-  userId: serial("user_id").notNull(),
+  userId: integer("user_id").notNull(),
   platform: varchar("platform", { length: 20 }).notNull(),
-  score: serial("score").notNull().default(0),
-  totalQuestions: serial("total_questions").notNull().default(0),
+  score: integer("score").notNull(),
+  totalQuestions: integer("total_questions").notNull(),
   completedAt: text("completed_at").notNull(),
 });
 
