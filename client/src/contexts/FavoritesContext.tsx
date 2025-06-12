@@ -50,6 +50,11 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
   });
 
   const toggleFavorite = (shortcutId: number) => {
+    // Prevent multiple clicks while mutation is pending
+    if (addFavoriteMutation.isPending || removeFavoriteMutation.isPending) {
+      return;
+    }
+    
     if (favorites.includes(shortcutId)) {
       removeFavoriteMutation.mutate(shortcutId);
     } else {

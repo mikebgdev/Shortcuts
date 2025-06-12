@@ -33,6 +33,17 @@ export class MemStorage implements IStorage {
     this.currentShortcutId = 1;
     this.currentFavoriteId = 1;
     this.initializeShortcuts();
+    this.initializeUsers();
+  }
+
+  private initializeUsers() {
+    // Create a default user for testing
+    const defaultUser: User = {
+      id: 1,
+      username: "demo",
+      password: "demo"
+    };
+    this.users.set(1, defaultUser);
   }
 
   private initializeShortcuts() {
@@ -738,6 +749,10 @@ export class MemStorage implements IStorage {
 
   async addFavorite(userId: number, shortcutId: number): Promise<Favorite> {
     const key = `${userId}-${shortcutId}`;
+    // Check if already exists to prevent duplicates
+    if (this.favorites.has(key)) {
+      return this.favorites.get(key)!;
+    }
     const id = this.currentFavoriteId++;
     const favorite: Favorite = { id, userId, shortcutId };
     this.favorites.set(key, favorite);
