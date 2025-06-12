@@ -113,6 +113,202 @@ export class MemStorage implements IStorage {
         category: "debugging",
         platform: "phpstorm"
       },
+      {
+        title: "Run File",
+        shortcut: "Ctrl+Shift+F10",
+        description: "Run current file",
+        category: "debugging",
+        platform: "phpstorm"
+      },
+      {
+        title: "Debug File",
+        shortcut: "Ctrl+Shift+F9",
+        description: "Debug current file",
+        category: "debugging",
+        platform: "phpstorm"
+      },
+      {
+        title: "Select All",
+        shortcut: "Ctrl+A",
+        description: "Select all text in current file",
+        category: "editing",
+        platform: "phpstorm"
+      },
+      {
+        title: "Cut Line",
+        shortcut: "Ctrl+X",
+        description: "Cut current line to clipboard",
+        category: "editing",
+        platform: "phpstorm"
+      },
+      {
+        title: "Copy Line",
+        shortcut: "Ctrl+C",
+        description: "Copy current line to clipboard",
+        category: "editing",
+        platform: "phpstorm"
+      },
+      {
+        title: "Paste",
+        shortcut: "Ctrl+V",
+        description: "Paste from clipboard",
+        category: "editing",
+        platform: "phpstorm"
+      },
+      {
+        title: "Undo",
+        shortcut: "Ctrl+Z",
+        description: "Undo last action",
+        category: "editing",
+        platform: "phpstorm"
+      },
+      {
+        title: "Redo",
+        shortcut: "Ctrl+Shift+Z",
+        description: "Redo last undone action",
+        category: "editing",
+        platform: "phpstorm"
+      },
+      {
+        title: "Move Line Up",
+        shortcut: "Ctrl+Shift+Up",
+        description: "Move current line up",
+        category: "editing",
+        platform: "phpstorm"
+      },
+      {
+        title: "Move Line Down",
+        shortcut: "Ctrl+Shift+Down",
+        description: "Move current line down",
+        category: "editing",
+        platform: "phpstorm"
+      },
+      {
+        title: "Delete Line",
+        shortcut: "Ctrl+Y",
+        description: "Delete current line",
+        category: "editing",
+        platform: "phpstorm"
+      },
+      {
+        title: "Expand Selection",
+        shortcut: "Ctrl+W",
+        description: "Expand selection to word/block",
+        category: "editing",
+        platform: "phpstorm"
+      },
+      {
+        title: "Shrink Selection",
+        shortcut: "Ctrl+Shift+W",
+        description: "Shrink selection",
+        category: "editing",
+        platform: "phpstorm"
+      },
+      {
+        title: "Surround With",
+        shortcut: "Ctrl+Alt+T",
+        description: "Surround selection with template",
+        category: "editing",
+        platform: "phpstorm"
+      },
+      {
+        title: "Join Lines",
+        shortcut: "Ctrl+Shift+J",
+        description: "Join current line with next",
+        category: "editing",
+        platform: "phpstorm"
+      },
+      {
+        title: "Quick Documentation",
+        shortcut: "Ctrl+Q",
+        description: "Show quick documentation",
+        category: "navigation",
+        platform: "phpstorm"
+      },
+      {
+        title: "Parameter Info",
+        shortcut: "Ctrl+P",
+        description: "Show function parameter info",
+        category: "navigation",
+        platform: "phpstorm"
+      },
+      {
+        title: "Show Error Description",
+        shortcut: "Ctrl+F1",
+        description: "Show error description at cursor",
+        category: "navigation",
+        platform: "phpstorm"
+      },
+      {
+        title: "Find Usage",
+        shortcut: "Alt+F7",
+        description: "Find usages of symbol",
+        category: "navigation",
+        platform: "phpstorm"
+      },
+      {
+        title: "Refactor Rename",
+        shortcut: "Shift+F6",
+        description: "Rename symbol across project",
+        category: "editing",
+        platform: "phpstorm"
+      },
+      {
+        title: "Extract Method",
+        shortcut: "Ctrl+Alt+M",
+        description: "Extract selection into method",
+        category: "editing",
+        platform: "phpstorm"
+      },
+      {
+        title: "Extract Variable",
+        shortcut: "Ctrl+Alt+V",
+        description: "Extract expression into variable",
+        category: "editing",
+        platform: "phpstorm"
+      },
+      {
+        title: "Optimize Imports",
+        shortcut: "Ctrl+Alt+O",
+        description: "Optimize and clean up imports",
+        category: "editing",
+        platform: "phpstorm"
+      },
+      {
+        title: "Go to Line",
+        shortcut: "Ctrl+G",
+        description: "Go to specific line number",
+        category: "navigation",
+        platform: "phpstorm"
+      },
+      {
+        title: "Structure View",
+        shortcut: "Alt+7",
+        description: "Open file structure view",
+        category: "navigation",
+        platform: "phpstorm"
+      },
+      {
+        title: "Project View",
+        shortcut: "Alt+1",
+        description: "Open project files view",
+        category: "navigation",
+        platform: "phpstorm"
+      },
+      {
+        title: "Find Replace",
+        shortcut: "Ctrl+R",
+        description: "Find and replace in file",
+        category: "navigation",
+        platform: "phpstorm"
+      },
+      {
+        title: "Find Replace All",
+        shortcut: "Ctrl+Shift+R",
+        description: "Find and replace in project",
+        category: "navigation",
+        platform: "phpstorm"
+      },
 
       // Arch Linux shortcuts
       {
@@ -144,6 +340,34 @@ export class MemStorage implements IStorage {
         platform: "archlinux"
       },
       {
+        title: "Clean Package Cache",
+        shortcut: "sudo pacman -Sc",
+        description: "Clean unused package cache",
+        category: "system",
+        platform: "archlinux"
+      },
+      {
+        title: "Package Info",
+        shortcut: "pacman -Si [package]",
+        description: "Show detailed package information",
+        category: "system",
+        platform: "archlinux"
+      },
+      {
+        title: "List Installed",
+        shortcut: "pacman -Q",
+        description: "List all installed packages",
+        category: "system",
+        platform: "archlinux"
+      },
+      {
+        title: "AUR Helper Install",
+        shortcut: "yay -S [package]",
+        description: "Install package from AUR with yay",
+        category: "system",
+        platform: "archlinux"
+      },
+      {
         title: "Open Terminal",
         shortcut: "Ctrl+Alt+T",
         description: "Open a new terminal window",
@@ -154,6 +378,34 @@ export class MemStorage implements IStorage {
         title: "Switch Desktop",
         shortcut: "Ctrl+Alt+Arrow",
         description: "Switch between virtual desktops",
+        category: "window",
+        platform: "archlinux"
+      },
+      {
+        title: "Close Window",
+        shortcut: "Alt+F4",
+        description: "Close the current window",
+        category: "window",
+        platform: "archlinux"
+      },
+      {
+        title: "Tiling Windows",
+        shortcut: "Super+Arrow",
+        description: "Tile windows to screen edges",
+        category: "window",
+        platform: "archlinux"
+      },
+      {
+        title: "Application Launcher",
+        shortcut: "Super+Space",
+        description: "Open application launcher",
+        category: "window",
+        platform: "archlinux"
+      },
+      {
+        title: "Lock Screen",
+        shortcut: "Super+L",
+        description: "Lock the screen",
         category: "window",
         platform: "archlinux"
       },
@@ -169,6 +421,83 @@ export class MemStorage implements IStorage {
         shortcut: "ls -la",
         description: "List all files with detailed information",
         category: "navigation",
+        platform: "archlinux"
+      },
+      {
+        title: "Find Files",
+        shortcut: "find / -name '[filename]'",
+        description: "Search for files system-wide",
+        category: "navigation",
+        platform: "archlinux"
+      },
+      {
+        title: "File Permissions",
+        shortcut: "chmod 755 [file]",
+        description: "Change file permissions",
+        category: "navigation",
+        platform: "archlinux"
+      },
+      {
+        title: "Copy Files",
+        shortcut: "cp -r [source] [destination]",
+        description: "Copy files and directories recursively",
+        category: "navigation",
+        platform: "archlinux"
+      },
+      {
+        title: "Move Files",
+        shortcut: "mv [source] [destination]",
+        description: "Move or rename files and directories",
+        category: "navigation",
+        platform: "archlinux"
+      },
+      {
+        title: "Text Editor",
+        shortcut: "nano [filename]",
+        description: "Open text editor for file editing",
+        category: "editing",
+        platform: "archlinux"
+      },
+      {
+        title: "Vim Editor",
+        shortcut: "vim [filename]",
+        description: "Open vim text editor",
+        category: "editing",
+        platform: "archlinux"
+      },
+      {
+        title: "Archive Extract",
+        shortcut: "tar -xzf [archive.tar.gz]",
+        description: "Extract tar.gz archive",
+        category: "system",
+        platform: "archlinux"
+      },
+      {
+        title: "System Logs",
+        shortcut: "journalctl -f",
+        description: "Follow system logs in real-time",
+        category: "system",
+        platform: "archlinux"
+      },
+      {
+        title: "Service Status",
+        shortcut: "systemctl status [service]",
+        description: "Check systemd service status",
+        category: "system",
+        platform: "archlinux"
+      },
+      {
+        title: "Start Service",
+        shortcut: "sudo systemctl start [service]",
+        description: "Start a systemd service",
+        category: "system",
+        platform: "archlinux"
+      },
+      {
+        title: "Process Monitor",
+        shortcut: "htop",
+        description: "Interactive process monitor",
+        category: "system",
         platform: "archlinux"
       },
 
@@ -227,6 +556,111 @@ export class MemStorage implements IStorage {
         shortcut: "PrtScr",
         description: "Take a screenshot of the entire screen",
         category: "window",
+        platform: "ubuntu"
+      },
+      {
+        title: "Open Terminal",
+        shortcut: "Ctrl+Alt+T",
+        description: "Open a new terminal window",
+        category: "window",
+        platform: "ubuntu"
+      },
+      {
+        title: "Close Window",
+        shortcut: "Alt+F4",
+        description: "Close the current window",
+        category: "window",
+        platform: "ubuntu"
+      },
+      {
+        title: "Minimize Window",
+        shortcut: "Super+H",
+        description: "Minimize the current window",
+        category: "window",
+        platform: "ubuntu"
+      },
+      {
+        title: "Maximize Window",
+        shortcut: "Super+Up",
+        description: "Maximize the current window",
+        category: "window",
+        platform: "ubuntu"
+      },
+      {
+        title: "Switch Workspaces",
+        shortcut: "Super+Page Up/Down",
+        description: "Switch between workspaces",
+        category: "window",
+        platform: "ubuntu"
+      },
+      {
+        title: "Show Desktop",
+        shortcut: "Super+D",
+        description: "Show desktop and hide all windows",
+        category: "window",
+        platform: "ubuntu"
+      },
+      {
+        title: "Open File Manager",
+        shortcut: "Super+E",
+        description: "Open the file manager",
+        category: "navigation",
+        platform: "ubuntu"
+      },
+      {
+        title: "Go Home Directory",
+        shortcut: "cd ~",
+        description: "Navigate to home directory",
+        category: "navigation",
+        platform: "ubuntu"
+      },
+      {
+        title: "List Hidden Files",
+        shortcut: "ls -la",
+        description: "List all files including hidden ones",
+        category: "navigation",
+        platform: "ubuntu"
+      },
+      {
+        title: "Find Files",
+        shortcut: "find . -name '[filename]'",
+        description: "Search for files by name",
+        category: "navigation",
+        platform: "ubuntu"
+      },
+      {
+        title: "Check Disk Usage",
+        shortcut: "df -h",
+        description: "Show disk space usage",
+        category: "system",
+        platform: "ubuntu"
+      },
+      {
+        title: "Process List",
+        shortcut: "ps aux",
+        description: "Show running processes",
+        category: "system",
+        platform: "ubuntu"
+      },
+      {
+        title: "Kill Process",
+        shortcut: "sudo kill -9 [PID]",
+        description: "Force kill a process by PID",
+        category: "system",
+        platform: "ubuntu"
+      },
+      {
+        title: "System Monitor",
+        shortcut: "htop",
+        description: "Interactive process monitor",
+        category: "system",
+        platform: "ubuntu"
+      },
+      {
+        title: "Network Status",
+        shortcut: "ip addr show",
+        description: "Show network interface information",
+        category: "system",
         platform: "ubuntu"
       }
     ];
