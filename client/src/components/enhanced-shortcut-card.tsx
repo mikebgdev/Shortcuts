@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Copy, Heart, Check, StickyNote, Tag, Plus, X, ChevronDown, ChevronRight } from "lucide-react";
+import { Copy, Heart, Check, StickyNote, Tag, Plus, X } from "lucide-react";
 import { useFavorites } from "@/contexts/FavoritesContext";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -24,15 +24,9 @@ export default function EnhancedShortcutCard({ shortcut, categoryColor, searchTe
   const [noteDialogOpen, setNoteDialogOpen] = useState(false);
   const [tagDialogOpen, setTagDialogOpen] = useState(false);
   const [noteText, setNoteText] = useState("");
-  const [isExpanded, setIsExpanded] = useState(viewMode === 'expanded');
   const { toggleFavorite, isFavorite } = useFavorites();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-
-  // Update expanded state when viewMode prop changes
-  useEffect(() => {
-    setIsExpanded(viewMode === 'expanded');
-  }, [viewMode]);
   const favorite = isFavorite(shortcut.id);
   const userId = 1; // Using demo user
 
@@ -180,29 +174,19 @@ export default function EnhancedShortcutCard({ shortcut, categoryColor, searchTe
   };
 
   return (
-    <Card className={`hover:shadow-lg transition-all duration-200 group border-l-4 ${isExpanded ? 'bg-slate-50 dark:bg-gray-800/50' : ''}`} 
+    <Card className="hover:shadow-lg transition-all duration-200 group border-l-4" 
           style={{ borderLeftColor: categoryColor }}>
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsExpanded(!isExpanded)}
-                className="p-0 h-6 w-6"
-              >
-                {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-              </Button>
-              <CardTitle className="text-lg font-semibold truncate">
+            <div className="flex items-center gap-2 mb-2">
+              <CardTitle className="text-lg font-semibold">
                 {highlightText(shortcut.title, searchTerm)}
               </CardTitle>
             </div>
-            {!isExpanded && (
-              <CardDescription className="text-sm ml-8 truncate">
-                {highlightText(shortcut.description, searchTerm)}
-              </CardDescription>
-            )}
+            <CardDescription className="text-sm text-gray-600 dark:text-gray-400">
+              {highlightText(shortcut.description, searchTerm)}
+            </CardDescription>
           </div>
           <div className="flex items-center gap-1 ml-2">
             <Dialog open={noteDialogOpen} onOpenChange={setNoteDialogOpen}>
@@ -319,19 +303,19 @@ export default function EnhancedShortcutCard({ shortcut, categoryColor, searchTe
             </Badge>
           </div>
           
-          <div className="bg-muted/50 dark:bg-muted/20 rounded-lg p-3 font-mono text-sm">
+          <div className="bg-gradient-to-r from-gray-900 to-gray-800 dark:from-gray-800 dark:to-gray-900 rounded-lg p-4 shadow-inner">
             <div className="flex items-center justify-between">
-              <span className="font-medium">
+              <code className="text-green-400 dark:text-green-300 font-mono text-base font-semibold tracking-wide">
                 {highlightText(shortcut.shortcut, searchTerm)}
-              </span>
+              </code>
               <Button 
                 variant="ghost" 
                 size="sm"
                 onClick={handleCopy}
-                className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                className="h-8 w-8 p-0 text-gray-400 hover:text-white transition-all"
               >
                 {copied ? (
-                  <Check className="h-4 w-4 text-green-600" />
+                  <Check className="h-4 w-4 text-green-400" />
                 ) : (
                   <Copy className="h-4 w-4" />
                 )}
@@ -364,35 +348,14 @@ export default function EnhancedShortcutCard({ shortcut, categoryColor, searchTe
             </div>
           )}
 
-          {/* Expanded View Content */}
-          {isExpanded && (
-            <div className="mt-4 space-y-3 border-t pt-3">
-              {/* Description in expanded view */}
-              <div className="text-sm text-gray-600 dark:text-gray-400">
-                <span className="font-medium">Descripción: </span>
-                {highlightText(shortcut.description, searchTerm)}
+          {/* User Note */}
+          {userNote && (
+            <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-950/20 rounded border-l-4 border-blue-500">
+              <div className="flex items-center gap-2 mb-2">
+                <StickyNote className="h-4 w-4 text-blue-500" />
+                <span className="text-sm font-medium text-blue-700 dark:text-blue-300">Mi Nota Personal</span>
               </div>
-              
-              {/* User Note */}
-              {userNote && (
-                <div className="p-3 bg-blue-50 dark:bg-blue-950/20 rounded border-l-4 border-blue-500">
-                  <div className="flex items-center gap-2 mb-2">
-                    <StickyNote className="h-4 w-4 text-blue-500" />
-                    <span className="text-sm font-medium text-blue-700 dark:text-blue-300">Mi Nota Personal</span>
-                  </div>
-                  <p className="text-sm text-blue-600 dark:text-blue-400">{userNote.note}</p>
-                </div>
-              )}
-              
-              {/* Usage Tips in expanded view */}
-              <div className="text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50 p-2 rounded">
-                <span className="font-medium">💡 Tip: </span>
-                {shortcut.category === 'navigation' && 'Usa este atajo para navegar más rápido por tu proyecto'}
-                {shortcut.category === 'editing' && 'Este atajo te ayudará a editar código más eficientemente'}
-                {shortcut.category === 'debugging' && 'Útil durante sesiones de debugging y resolución de problemas'}
-                {shortcut.category === 'system' && 'Comando del sistema para administración y monitoreo'}
-                {shortcut.category === 'window' && 'Gestiona ventanas y espacios de trabajo'}
-              </div>
+              <p className="text-sm text-blue-600 dark:text-blue-400">{userNote.note}</p>
             </div>
           )}
         </div>
