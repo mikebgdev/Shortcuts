@@ -17,6 +17,35 @@ export const favorites = pgTable("favorites", {
   userId: serial("user_id").notNull(),
 });
 
+export const userNotes = pgTable("user_notes", {
+  id: serial("id").primaryKey(),
+  shortcutId: serial("shortcut_id").notNull(),
+  userId: serial("user_id").notNull(),
+  note: text("note").notNull(),
+});
+
+export const tags = pgTable("tags", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 50 }).notNull(),
+  color: varchar("color", { length: 20 }).notNull().default("#3B82F6"),
+});
+
+export const shortcutTags = pgTable("shortcut_tags", {
+  id: serial("id").primaryKey(),
+  shortcutId: serial("shortcut_id").notNull(),
+  tagId: serial("tag_id").notNull(),
+  userId: serial("user_id").notNull(),
+});
+
+export const quizSessions = pgTable("quiz_sessions", {
+  id: serial("id").primaryKey(),
+  userId: serial("user_id").notNull(),
+  platform: varchar("platform", { length: 20 }).notNull(),
+  score: serial("score").notNull().default(0),
+  totalQuestions: serial("total_questions").notNull().default(0),
+  completedAt: text("completed_at").notNull(),
+});
+
 export const insertShortcutSchema = createInsertSchema(shortcuts).omit({
   id: true,
 });
@@ -30,6 +59,34 @@ export const insertFavoriteSchema = createInsertSchema(favorites).omit({
 
 export type InsertFavorite = z.infer<typeof insertFavoriteSchema>;
 export type Favorite = typeof favorites.$inferSelect;
+
+export const insertUserNoteSchema = createInsertSchema(userNotes).omit({
+  id: true,
+});
+
+export type InsertUserNote = z.infer<typeof insertUserNoteSchema>;
+export type UserNote = typeof userNotes.$inferSelect;
+
+export const insertTagSchema = createInsertSchema(tags).omit({
+  id: true,
+});
+
+export type InsertTag = z.infer<typeof insertTagSchema>;
+export type Tag = typeof tags.$inferSelect;
+
+export const insertShortcutTagSchema = createInsertSchema(shortcutTags).omit({
+  id: true,
+});
+
+export type InsertShortcutTag = z.infer<typeof insertShortcutTagSchema>;
+export type ShortcutTag = typeof shortcutTags.$inferSelect;
+
+export const insertQuizSessionSchema = createInsertSchema(quizSessions).omit({
+  id: true,
+});
+
+export type InsertQuizSession = z.infer<typeof insertQuizSessionSchema>;
+export type QuizSession = typeof quizSessions.$inferSelect;
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),

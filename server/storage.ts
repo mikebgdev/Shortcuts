@@ -1,4 +1,4 @@
-import { shortcuts, users, favorites, type Shortcut, type InsertShortcut, type User, type InsertUser, type Favorite, type InsertFavorite } from "@shared/schema";
+import { shortcuts, users, favorites, userNotes, tags, shortcutTags, quizSessions, type Shortcut, type InsertShortcut, type User, type InsertUser, type Favorite, type InsertFavorite, type UserNote, type InsertUserNote, type Tag, type InsertTag, type ShortcutTag, type InsertShortcutTag, type QuizSession, type InsertQuizSession } from "@shared/schema";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -15,25 +15,62 @@ export interface IStorage {
   addFavorite(userId: number, shortcutId: number): Promise<Favorite>;
   removeFavorite(userId: number, shortcutId: number): Promise<void>;
   isFavorite(userId: number, shortcutId: number): Promise<boolean>;
+
+  // User Notes
+  getUserNote(userId: number, shortcutId: number): Promise<UserNote | undefined>;
+  createUserNote(note: InsertUserNote): Promise<UserNote>;
+  updateUserNote(userId: number, shortcutId: number, note: string): Promise<void>;
+  deleteUserNote(userId: number, shortcutId: number): Promise<void>;
+
+  // Tags
+  getAllTags(): Promise<Tag[]>;
+  createTag(tag: InsertTag): Promise<Tag>;
+  deleteTag(tagId: number): Promise<void>;
+  
+  // Shortcut Tags
+  getShortcutTags(userId: number, shortcutId: number): Promise<Tag[]>;
+  addShortcutTag(userId: number, shortcutId: number, tagId: number): Promise<ShortcutTag>;
+  removeShortcutTag(userId: number, shortcutId: number, tagId: number): Promise<void>;
+  
+  // Quiz Sessions
+  createQuizSession(session: InsertQuizSession): Promise<QuizSession>;
+  getQuizHistory(userId: number): Promise<QuizSession[]>;
 }
 
 export class MemStorage implements IStorage {
   private users: Map<number, User>;
   private shortcuts: Map<number, Shortcut>;
   private favorites: Map<string, Favorite>;
+  private userNotes: Map<string, UserNote>;
+  private tags: Map<number, Tag>;
+  private shortcutTags: Map<string, ShortcutTag>;
+  private quizSessions: Map<number, QuizSession>;
   private currentUserId: number;
   private currentShortcutId: number;
   private currentFavoriteId: number;
+  private currentUserNoteId: number;
+  private currentTagId: number;
+  private currentShortcutTagId: number;
+  private currentQuizSessionId: number;
 
   constructor() {
     this.users = new Map();
     this.shortcuts = new Map();
     this.favorites = new Map();
+    this.userNotes = new Map();
+    this.tags = new Map();
+    this.shortcutTags = new Map();
+    this.quizSessions = new Map();
     this.currentUserId = 1;
     this.currentShortcutId = 1;
     this.currentFavoriteId = 1;
+    this.currentUserNoteId = 1;
+    this.currentTagId = 1;
+    this.currentShortcutTagId = 1;
+    this.currentQuizSessionId = 1;
     this.initializeShortcuts();
     this.initializeUsers();
+    this.initializeTags();
   }
 
   private initializeUsers() {
@@ -768,6 +805,114 @@ export class MemStorage implements IStorage {
   async isFavorite(userId: number, shortcutId: number): Promise<boolean> {
     const key = `${userId}-${shortcutId}`;
     return this.favorites.has(key);
+  }
+
+  private initializeTags() {
+    const defaultTags: Omit<Tag, 'id'>[] = [
+      { name: "Important", color: "#EF4444" },
+      { name: "Quick", color: "#10B981" },
+      { name: "Advanced", color: "#8B5CF6" },
+      { name: "Beginner", color: "#F59E0B" },
+      { name: "Debug", color: "#EC4899" },
+      { name: "Navigation", color: "#3B82F6" },
+      { name: "Editing", color: "#6366F1" },
+      { name: "System", color: "#64748B" }
+    ];
+
+    defaultTags.forEach(tag => {
+      const id = this.currentTagId++;
+      this.tags.set(id, { ...tag, id });
+    });
+  }
+
+  // User Notes
+  async getUserNote(userId: number, shortcutId: number): Promise<UserNote | undefined> {
+    const key = `${userId}-${shortcutId}`;
+    return this.userNotes.get(key);
+  }
+
+  async createUserNote(note: InsertUserNote): Promise<UserNote> {
+    const id = this.currentUserNoteId++;
+    const userNote: UserNote = { ...note, id };
+    const key = `${note.userId}-${note.shortcutId}`;
+    this.userNotes.set(key, userNote);
+    return userNote;
+  }
+
+  async updateUserNote(userId: number, shortcutId: number, note: string): Promise<void> {
+    const key = `${userId}-${shortcutId}`;
+    const existingNote = this.userNotes.get(key);
+    if (existingNote) {
+      this.userNotes.set(key, { ...existingNote, note });
+    }
+  }
+
+  async deleteUserNote(userId: number, shortcutId: number): Promise<void> {
+    const key = `${userId}-${shortcutId}`;
+    this.userNotes.delete(key);
+  }
+
+  // Tags
+  async getAllTags(): Promise<Tag[]> {
+    return Array.from(this.tags.values());
+  }
+
+  async createTag(tag: InsertTag): Promise<Tag> {
+    const id = this.currentTagId++;
+    const newTag: Tag = { ...tag, id };
+    this.tags.set(id, newTag);
+    return newTag;
+  }
+
+  async deleteTag(tagId: number): Promise<void> {
+    this.tags.delete(tagId);
+    // Remove all shortcut tags with this tag
+    Array.from(this.shortcutTags.entries()).forEach(([key, shortcutTag]) => {
+      if (shortcutTag.tagId === tagId) {
+        this.shortcutTags.delete(key);
+      }
+    });
+  }
+
+  // Shortcut Tags
+  async getShortcutTags(userId: number, shortcutId: number): Promise<Tag[]> {
+    const shortcutTagsForUser = Array.from(this.shortcutTags.values())
+      .filter(st => st.userId === userId && st.shortcutId === shortcutId);
+    
+    return shortcutTagsForUser
+      .map(st => this.tags.get(st.tagId))
+      .filter(tag => tag !== undefined) as Tag[];
+  }
+
+  async addShortcutTag(userId: number, shortcutId: number, tagId: number): Promise<ShortcutTag> {
+    const key = `${userId}-${shortcutId}-${tagId}`;
+    // Check if already exists
+    if (this.shortcutTags.has(key)) {
+      return this.shortcutTags.get(key)!;
+    }
+    const id = this.currentShortcutTagId++;
+    const shortcutTag: ShortcutTag = { id, userId, shortcutId, tagId };
+    this.shortcutTags.set(key, shortcutTag);
+    return shortcutTag;
+  }
+
+  async removeShortcutTag(userId: number, shortcutId: number, tagId: number): Promise<void> {
+    const key = `${userId}-${shortcutId}-${tagId}`;
+    this.shortcutTags.delete(key);
+  }
+
+  // Quiz Sessions
+  async createQuizSession(session: InsertQuizSession): Promise<QuizSession> {
+    const id = this.currentQuizSessionId++;
+    const quizSession: QuizSession = { ...session, id };
+    this.quizSessions.set(id, quizSession);
+    return quizSession;
+  }
+
+  async getQuizHistory(userId: number): Promise<QuizSession[]> {
+    return Array.from(this.quizSessions.values())
+      .filter(session => session.userId === userId)
+      .sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime());
   }
 }
 
