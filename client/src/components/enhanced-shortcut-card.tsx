@@ -19,6 +19,18 @@ interface EnhancedShortcutCardProps {
   viewMode?: 'compact' | 'expanded';
 }
 
+// Helper function for category colors
+const getCategoryColorClass = (category: string) => {
+  const colorMap = {
+    'navigation': 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+    'editing': 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
+    'debugging': 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
+    'system': 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
+    'window': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'
+  };
+  return colorMap[category as keyof typeof colorMap] || 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300';
+};
+
 export default function EnhancedShortcutCard({ shortcut, categoryColor, searchTerm, viewMode = 'compact' }: EnhancedShortcutCardProps) {
   const [copied, setCopied] = useState(false);
   const [noteDialogOpen, setNoteDialogOpen] = useState(false);
@@ -293,8 +305,7 @@ export default function EnhancedShortcutCard({ shortcut, categoryColor, searchTe
           <div className="flex items-center justify-between">
             <Badge 
               variant="secondary" 
-              className="text-xs px-2 py-1"
-              style={{ backgroundColor: `${categoryColor}20`, color: categoryColor }}
+              className={`text-xs px-2 py-1 font-medium ${getCategoryColorClass(shortcut.category)}`}
             >
               {shortcut.category}
             </Badge>
