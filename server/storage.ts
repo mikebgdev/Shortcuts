@@ -923,4 +923,175 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+// Use database storage instead of memory storage
+import { db } from "./db";
+import { eq, and } from "drizzle-orm";
+
+export class DatabaseStorage implements IStorage {
+  async getUser(id: number): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
+    return user;
+  }
+
+  async getAllShortcuts(): Promise<Shortcut[]> {
+    return await db.select().from(shortcuts);
+  }
+
+  async getShortcutsByPlatform(platform: string): Promise<Shortcut[]> {
+    return await db.select().from(shortcuts).where(eq(shortcuts.platform, platform));
+  }
+
+  async getShortcutsByCategory(category: string): Promise<Shortcut[]> {
+    return await db.select().from(shortcuts).where(eq(shortcuts.category, category));
+  }
+
+  async searchShortcuts(query: string): Promise<Shortcut[]> {
+    return await db.select().from(shortcuts).where(
+      // Simple text search - in production you'd use full-text search
+      eq(shortcuts.title, query)
+    );
+  }
+
+  async createShortcut(shortcut: InsertShortcut): Promise<Shortcut> {
+    const [newShortcut] = await db
+      .insert(shortcuts)
+      .values(shortcut)
+      .returning();
+    return newShortcut;
+  }
+
+  async getFavorites(userId: number): Promise<number[]> {
+    const favs = await db.select().from(favorites).where(eq(favorites.userId, userId));
+    return favs.map(fav => fav.shortcutId);
+  }
+
+  async addFavorite(userId: number, shortcutId: number): Promise<Favorite> {
+    const [favorite] = await db
+      .insert(favorites)
+      .values({ userId, shortcutId })
+      .returning();
+    return favorite;
+  }
+
+  async removeFavorite(userId: number, shortcutId: number): Promise<void> {
+    await db.delete(favorites).where(
+      and(eq(favorites.userId, userId), eq(favorites.shortcutId, shortcutId))
+    );
+  }
+
+  async isFavorite(userId: number, shortcutId: number): Promise<boolean> {
+    const [favorite] = await db.select().from(favorites).where(
+      and(eq(favorites.userId, userId), eq(favorites.shortcutId, shortcutId))
+    );
+    return !!favorite;
+  }
+
+  // User Notes
+  async getUserNote(userId: number, shortcutId: number): Promise<UserNote | undefined> {
+    const [note] = await db.select().from(userNotes).where(
+      and(eq(userNotes.userId, userId), eq(userNotes.shortcutId, shortcutId))
+    );
+    return note || undefined;
+  }
+
+  async createUserNote(note: InsertUserNote): Promise<UserNote> {
+    const [userNote] = await db
+      .insert(userNotes)
+      .values(note)
+      .returning();
+    return userNote;
+  }
+
+  async updateUserNote(userId: number, shortcutId: number, note: string): Promise<void> {
+    await db.update(userNotes)
+      .set({ note })
+      .where(and(eq(userNotes.userId, userId), eq(userNotes.shortcutId, shortcutId)));
+  }
+
+  async deleteUserNote(userId: number, shortcutId: number): Promise<void> {
+    await db.delete(userNotes).where(
+      and(eq(userNotes.userId, userId), eq(userNotes.shortcutId, shortcutId))
+    );
+  }
+
+  // Tags
+  async getAllTags(): Promise<Tag[]> {
+    return await db.select().from(tags);
+  }
+
+  async createTag(tag: InsertTag): Promise<Tag> {
+    const [newTag] = await db
+      .insert(tags)
+      .values(tag)
+      .returning();
+    return newTag;
+  }
+
+  async deleteTag(tagId: number): Promise<void> {
+    await db.delete(tags).where(eq(tags.id, tagId));
+    await db.delete(shortcutTags).where(eq(shortcutTags.tagId, tagId));
+  }
+
+  // Shortcut Tags
+  async getShortcutTags(userId: number, shortcutId: number): Promise<Tag[]> {
+    const result = await db
+      .select({
+        id: tags.id,
+        name: tags.name,
+        color: tags.color,
+      })
+      .from(shortcutTags)
+      .leftJoin(tags, eq(shortcutTags.tagId, tags.id))
+      .where(and(eq(shortcutTags.userId, userId), eq(shortcutTags.shortcutId, shortcutId)));
+    
+    return result.filter(tag => tag.id !== null) as Tag[];
+  }
+
+  async addShortcutTag(userId: number, shortcutId: number, tagId: number): Promise<ShortcutTag> {
+    const [shortcutTag] = await db
+      .insert(shortcutTags)
+      .values({ userId, shortcutId, tagId })
+      .returning();
+    return shortcutTag;
+  }
+
+  async removeShortcutTag(userId: number, shortcutId: number, tagId: number): Promise<void> {
+    await db.delete(shortcutTags).where(
+      and(
+        eq(shortcutTags.userId, userId),
+        eq(shortcutTags.shortcutId, shortcutId),
+        eq(shortcutTags.tagId, tagId)
+      )
+    );
+  }
+
+  // Quiz Sessions
+  async createQuizSession(session: InsertQuizSession): Promise<QuizSession> {
+    const [quizSession] = await db
+      .insert(quizSessions)
+      .values(session)
+      .returning();
+    return quizSession;
+  }
+
+  async getQuizHistory(userId: number): Promise<QuizSession[]> {
+    return await db.select().from(quizSessions)
+      .where(eq(quizSessions.userId, userId))
+      .orderBy(quizSessions.completedAt);
+  }
+}
+
+export const storage = new DatabaseStorage();

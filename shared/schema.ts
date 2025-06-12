@@ -1,4 +1,4 @@
-import { pgTable, text, serial, varchar } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, varchar, integer } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -13,8 +13,8 @@ export const shortcuts = pgTable("shortcuts", {
 
 export const favorites = pgTable("favorites", {
   id: serial("id").primaryKey(),
-  shortcutId: serial("shortcut_id").notNull(),
-  userId: serial("user_id").notNull(),
+  shortcutId: integer("shortcut_id").notNull(),
+  userId: integer("user_id").notNull(),
 });
 
 export const userNotes = pgTable("user_notes", {
