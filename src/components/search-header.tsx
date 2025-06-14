@@ -1,7 +1,8 @@
-import { Search, Moon, Sun } from "lucide-react";
+import { Search, Moon, Sun, Database } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/contexts/ThemeContext";
+import { Link } from "wouter";
 
 interface SearchHeaderProps {
   searchTerm: string;
@@ -21,7 +22,7 @@ export default function SearchHeader({ searchTerm, onSearchChange }: SearchHeade
               <h1 className="text-xl font-bold text-slate-900 dark:text-white">Shortcuts Hub</h1>
             </div>
           </div>
-          
+
           <div className="flex-1 max-w-md mx-8">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 dark:text-gray-400 h-4 w-4" />
@@ -37,6 +38,17 @@ export default function SearchHeader({ searchTerm, onSearchChange }: SearchHeade
           </div>
 
           <div className="flex items-center space-x-4">
+            <Link href="/firebase-admin">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-slate-600 dark:text-gray-300 hover:text-slate-900 dark:hover:text-white"
+              >
+                <Database className="h-4 w-4 mr-1" />
+                <span className="hidden md:inline">Firebase Admin</span>
+              </Button>
+            </Link>
+
             <Button
               variant="ghost"
               size="sm"
@@ -45,7 +57,7 @@ export default function SearchHeader({ searchTerm, onSearchChange }: SearchHeade
             >
               {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </Button>
-            
+
             <div className="flex items-center space-x-2">
               <span className="text-sm text-slate-500 dark:text-gray-400 hidden sm:block">Press</span>
               <kbd className="px-2 py-1 text-xs font-semibold text-slate-500 dark:text-gray-400 bg-slate-100 dark:bg-gray-800 border border-slate-300 dark:border-gray-600 rounded hidden sm:inline-block">

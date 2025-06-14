@@ -6,11 +6,10 @@ import { Progress } from "@/components/ui/progress";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Trophy, RotateCcw, ArrowLeft, Clock, CheckCircle, XCircle } from "lucide-react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
+import { getShortcuts, getQuizHistory, createQuizSession } from "@/lib/firebase";
+import { useToast } from '@/contexts/ToastContext';
 import { Link } from "wouter";
-import type { Shortcut, QuizSession } from "@shared/schema";
+import type { Shortcut, QuizSession } from "@/lib/types";
 
 interface QuizQuestion {
   shortcut: Shortcut;
@@ -30,34 +29,69 @@ export default function QuizPage() {
   const [timeLeft, setTimeLeft] = useState(300); // 5 minutes
   const [timerActive, setTimerActive] = useState(false);
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   const userId = 1; // Demo user
+  const [shortcuts, setShortcuts] = useState<Shortcut[]>([]);
+  const [quizHistory, setQuizHistory] = useState<QuizSession[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const { data: shortcuts = [] } = useQuery({
-    queryKey: ['/api/shortcuts'],
-    queryFn: () => apiRequest('/api/shortcuts'),
-  });
+  // Fetch shortcuts
+  useEffect(() => {
+    const fetchShortcuts = async () => {
+      try {
+        const data = await getShortcuts();
+        setShortcuts(data);
+      } catch (error) {
+        console.error('Error fetching shortcuts:', error);
+      }
+    };
 
-  const { data: quizHistory = [] } = useQuery({
-    queryKey: ['/api/quiz-history', userId],
-    queryFn: () => apiRequest(`/api/quiz-history/${userId}`),
-  });
+    fetchShortcuts();
+  }, []);
 
-  const saveQuizMutation = useMutation({
-    mutationFn: (sessionData: { userId: number; platform: string; score: number; totalQuestions: number; completedAt: string }) =>
-      apiRequest('/api/quiz-sessions', {
-        method: 'POST',
-        body: JSON.stringify(sessionData),
-        headers: { 'Content-Type': 'application/json' }
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/quiz-history', userId] });
+  // Fetch quiz history
+  useEffect(() => {
+    const fetchQuizHistory = async () => {
+      try {
+        const data = await getQuizHistory(userId);
+        setQuizHistory(data);
+      } catch (error) {
+        console.error('Error fetching quiz history:', error);
+      }
+    };
+
+    fetchQuizHistory();
+  }, [userId]);
+
+  // Save quiz session
+  const saveQuizSession = async (sessionData: { userId: number; platform: string; score: number; totalQuestions: number; completedAt: string }) => {
+    setIsLoading(true);
+    try {
+      await createQuizSession(
+        sessionData.userId,
+        sessionData.platform,
+        sessionData.score,
+        sessionData.totalQuestions,
+        sessionData.completedAt
+      );
+
+      // Refresh quiz history
+      const updatedHistory = await getQuizHistory(userId);
+      setQuizHistory(updatedHistory);
+
       toast({
         title: "Quiz completado",
         description: "Tu puntuación ha sido guardada.",
       });
+    } catch (error) {
+      console.error('Error saving quiz session:', error);
+      toast({
+        title: "Error",
+        description: "No se pudo guardar la puntuación.",
+      });
+    } finally {
+      setIsLoading(false);
     }
-  });
+  };
 
   // Timer effect
   useEffect(() => {
@@ -88,12 +122,11 @@ export default function QuizPage() {
 
   const startQuiz = (platform: string) => {
     const platformShortcuts = shortcuts.filter((s: Shortcut) => s.platform === platform);
-    
+
     if (platformShortcuts.length < 10) {
       toast({
         title: "Insuficientes shortcuts",
         description: "Se necesitan al menos 10 shortcuts para crear un quiz.",
-        variant: "destructive"
       });
       return;
     }
@@ -141,12 +174,12 @@ export default function QuizPage() {
   const handleQuizComplete = () => {
     setTimerActive(false);
     setQuizCompleted(true);
-    
+
     const finalScore = userAnswers.filter((answer, index) => 
       answer === questions[index]?.correctAnswer
     ).length;
 
-    saveQuizMutation.mutate({
+    saveQuizSession({
       userId,
       platform: selectedPlatform,
       score: finalScore,
@@ -302,7 +335,7 @@ export default function QuizPage() {
             {questions.map((question, index) => {
               const userAnswer = userAnswers[index];
               const isCorrect = userAnswer === question.correctAnswer;
-              
+
               return (
                 <Card key={index} className={`border-l-4 ${isCorrect ? 'border-green-500' : 'border-red-500'}`}>
                   <CardContent className="p-4">

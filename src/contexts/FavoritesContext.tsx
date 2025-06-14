@@ -1,10 +1,10 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { getFavorites, addFavorite, removeFavorite } from '@/lib/firebase';
 
 interface FavoritesContextType {
-  favorites: number[];
-  toggleFavorite: (shortcutId: number) => void;
-  isFavorite: (shortcutId: number) => boolean;
+  favorites: string[];
+  toggleFavorite: (shortcutId: string) => void;
+  isFavorite: (shortcutId: string) => boolean;
   isLoading: boolean;
 }
 
@@ -14,90 +14,82 @@ const FavoritesContext = createContext<FavoritesContextType | undefined>(undefin
 const CURRENT_USER_ID = 1;
 
 export function FavoritesProvider({ children }: { children: React.ReactNode }) {
-  const queryClient = useQueryClient();
-  
-  const { data: favorites = [], isLoading } = useQuery<number[]>({
-    queryKey: ['/api/favorites', CURRENT_USER_ID],
-  });
+  const [favorites, setFavorites] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isPending, setIsPending] = useState(false);
 
-  const addFavoriteMutation = useMutation({
-    mutationFn: async (shortcutId: number) => {
-      const response = await fetch(`/api/favorites`, {
-        method: 'POST',
-        body: JSON.stringify({ userId: CURRENT_USER_ID, shortcutId }),
-        headers: { 'Content-Type': 'application/json' },
-      });
-      if (!response.ok) throw new Error('Failed to add favorite');
-      return response.json();
-    },
-    onMutate: async (shortcutId) => {
-      // Cancel outgoing refetches
-      await queryClient.cancelQueries({ queryKey: ['/api/favorites', CURRENT_USER_ID] });
-      
-      // Snapshot the previous value
-      const previousFavorites = queryClient.getQueryData(['/api/favorites', CURRENT_USER_ID]);
-      
-      // Optimistically update
-      queryClient.setQueryData(['/api/favorites', CURRENT_USER_ID], (old: number[] = []) => {
-        return old.includes(shortcutId) ? old : [...old, shortcutId];
-      });
-      
-      return { previousFavorites };
-    },
-    onError: (err, shortcutId, context) => {
+  // Fetch favorites
+  useEffect(() => {
+    const fetchFavorites = async () => {
+      setIsLoading(true);
+      try {
+        const data = await getFavorites(CURRENT_USER_ID);
+        setFavorites(data);
+      } catch (error) {
+        console.error('Error fetching favorites:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchFavorites();
+  }, []);
+
+  // Add favorite
+  const handleAddFavorite = async (shortcutId: string) => {
+    setIsPending(true);
+
+    // Optimistically update
+    setFavorites(prev => [...prev, shortcutId]);
+
+    try {
+      await addFavorite(CURRENT_USER_ID, shortcutId);
+    } catch (error) {
+      console.error('Error adding favorite:', error);
+
       // Rollback on error
-      queryClient.setQueryData(['/api/favorites', CURRENT_USER_ID], context?.previousFavorites);
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/favorites', CURRENT_USER_ID] });
-    },
-  });
-
-  const removeFavoriteMutation = useMutation({
-    mutationFn: async (shortcutId: number) => {
-      const response = await fetch(`/api/favorites/${CURRENT_USER_ID}/${shortcutId}`, {
-        method: 'DELETE',
-      });
-      if (!response.ok) throw new Error('Failed to remove favorite');
-      return response.json();
-    },
-    onMutate: async (shortcutId) => {
-      // Cancel outgoing refetches
-      await queryClient.cancelQueries({ queryKey: ['/api/favorites', CURRENT_USER_ID] });
-      
-      // Snapshot the previous value
-      const previousFavorites = queryClient.getQueryData(['/api/favorites', CURRENT_USER_ID]);
-      
-      // Optimistically update
-      queryClient.setQueryData(['/api/favorites', CURRENT_USER_ID], (old: number[] = []) => {
-        return old.filter(id => id !== shortcutId);
-      });
-      
-      return { previousFavorites };
-    },
-    onError: (err, shortcutId, context) => {
-      // Rollback on error
-      queryClient.setQueryData(['/api/favorites', CURRENT_USER_ID], context?.previousFavorites);
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/favorites', CURRENT_USER_ID] });
-    },
-  });
-
-  const toggleFavorite = (shortcutId: number) => {
-    // Prevent multiple clicks while mutation is pending
-    if (addFavoriteMutation.isPending || removeFavoriteMutation.isPending) {
-      return;
-    }
-    
-    if (favorites.includes(shortcutId)) {
-      removeFavoriteMutation.mutate(shortcutId);
-    } else {
-      addFavoriteMutation.mutate(shortcutId);
+      setFavorites(prev => prev.filter(id => id !== shortcutId));
+    } finally {
+      setIsPending(false);
     }
   };
 
-  const isFavorite = (shortcutId: number) => {
+  // Remove favorite
+  const handleRemoveFavorite = async (shortcutId: string) => {
+    setIsPending(true);
+
+    // Store previous state for rollback
+    const previousFavorites = [...favorites];
+
+    // Optimistically update
+    setFavorites(prev => prev.filter(id => id !== shortcutId));
+
+    try {
+      await removeFavorite(CURRENT_USER_ID, shortcutId);
+    } catch (error) {
+      console.error('Error removing favorite:', error);
+
+      // Rollback on error
+      setFavorites(previousFavorites);
+    } finally {
+      setIsPending(false);
+    }
+  };
+
+  const toggleFavorite = (shortcutId: string) => {
+    // Prevent multiple clicks while operation is pending
+    if (isPending) {
+      return;
+    }
+
+    if (favorites.includes(shortcutId)) {
+      handleRemoveFavorite(shortcutId);
+    } else {
+      handleAddFavorite(shortcutId);
+    }
+  };
+
+  const isFavorite = (shortcutId: string) => {
     return favorites.includes(shortcutId);
   };
 
@@ -106,7 +98,7 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
       favorites,
       toggleFavorite,
       isFavorite,
-      isLoading: isLoading || addFavoriteMutation.isPending || removeFavoriteMutation.isPending,
+      isLoading: isLoading || isPending,
     }}>
       {children}
     </FavoritesContext.Provider>

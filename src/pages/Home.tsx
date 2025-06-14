@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
 import SearchHeader from "@/components/search-header";
 import PlatformSidebar from "@/components/platform-sidebar";
+import { getShortcuts } from "@/lib/firebase";
+import type { Shortcut } from "@/lib/types";
 
 import EnhancedShortcutCard from "@/components/enhanced-shortcut-card";
 import { Button } from "@/components/ui/button";
@@ -35,9 +36,25 @@ export default function ShortcutsPage() {
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
 
 
-  const { data: shortcuts = [], isLoading } = useQuery<Shortcut[]>({
-    queryKey: ["/api/shortcuts"],
-  });
+  const [shortcuts, setShortcuts] = useState<Shortcut[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Fetch shortcuts
+  useEffect(() => {
+    const fetchShortcuts = async () => {
+      setIsLoading(true);
+      try {
+        const data = await getShortcuts();
+        setShortcuts(data);
+      } catch (error) {
+        console.error('Error fetching shortcuts:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchShortcuts();
+  }, []);
 
   const { favorites } = useFavorites();
 
@@ -50,7 +67,7 @@ export default function ShortcutsPage() {
       shortcut.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
       shortcut.shortcut.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFavorites = !showFavoritesOnly || favorites.includes(shortcut.id);
-    
+
     return matchesPlatform && matchesCategory && matchesSearch && matchesFavorites;
   });
 
@@ -97,7 +114,7 @@ export default function ShortcutsPage() {
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
       />
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           <PlatformSidebar
@@ -108,7 +125,7 @@ export default function ShortcutsPage() {
             onPlatformChange={setActivePlatform}
             onCategoryToggle={handleCategoryToggle}
           />
-          
+
           <div className="lg:col-span-3">
             <div className="mb-6">
               <div className="flex items-center justify-between mb-4">
@@ -137,7 +154,7 @@ export default function ShortcutsPage() {
                   </Button>
                 </div>
               </div>
-              
+
               <div className="flex items-center justify-end">
                 <div className="text-sm text-gray-500">
                   {filteredShortcuts.length} shortcuts

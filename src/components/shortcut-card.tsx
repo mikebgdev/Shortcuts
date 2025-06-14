@@ -1,8 +1,8 @@
 import { useState } from "react";
-import type { Shortcut } from "@shared/schema";
+import type { Shortcut } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Copy, Check, Heart } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from '@/contexts/ToastContext';
 import { useFavorites } from "@/contexts/FavoritesContext";
 
 interface ShortcutCardProps {
@@ -21,14 +21,14 @@ export default function ShortcutCard({ shortcut, categoryColor, searchTerm }: Sh
       await navigator.clipboard.writeText(shortcut.shortcut);
       setCopied(true);
       toast({
+        title: "Success",
         description: "Copied to clipboard!",
-        duration: 2000,
       });
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       toast({
+        title: "Failure",
         description: "Failed to copy to clipboard",
-        variant: "destructive",
       });
     }
   };
