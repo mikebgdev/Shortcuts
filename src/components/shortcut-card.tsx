@@ -1,9 +1,9 @@
-import { useState } from "react";
-import type { Shortcut } from "@/lib/types";
-import { Button } from "@/components/ui/button";
-import { Copy, Check, Heart } from "lucide-react";
+import { useState } from 'react';
+import type { Shortcut } from '@/lib/types';
+import { Button } from '@/components/ui/button';
+import { Check, Copy, Heart } from 'lucide-react';
 import { useToast } from '@/contexts/ToastContext';
-import { useFavorites } from "@/contexts/FavoritesContext";
+import { useFavorites } from '@/contexts/FavoritesContext';
 
 interface ShortcutCardProps {
   shortcut: Shortcut;
@@ -11,7 +11,11 @@ interface ShortcutCardProps {
   searchTerm: string;
 }
 
-export default function ShortcutCard({ shortcut, categoryColor, searchTerm }: ShortcutCardProps) {
+export default function ShortcutCard({
+  shortcut,
+  categoryColor,
+  searchTerm,
+}: ShortcutCardProps) {
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
   const { isFavorite, toggleFavorite } = useFavorites();
@@ -21,37 +25,41 @@ export default function ShortcutCard({ shortcut, categoryColor, searchTerm }: Sh
       await navigator.clipboard.writeText(shortcut.shortcut);
       setCopied(true);
       toast({
-        title: "Success",
-        description: "Copied to clipboard!",
+        title: 'Success',
+        description: 'Copied to clipboard!',
       });
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       toast({
-        title: "Failure",
-        description: "Failed to copy to clipboard",
+        title: 'Failure',
+        description: 'Failed to copy to clipboard',
       });
     }
   };
 
   const highlightText = (text: string, term: string) => {
     if (!term) return text;
-    
+
     const regex = new RegExp(`(${term})`, 'gi');
     const parts = text.split(regex);
-    
-    return parts.map((part, index) => 
+
+    return parts.map((part, index) =>
       regex.test(part) ? (
         <mark key={index} className="bg-yellow-200 px-1 rounded">
           {part}
         </mark>
       ) : (
         part
-      )
+      ),
     );
   };
 
   const renderShortcut = (shortcutText: string) => {
-    if (shortcutText.includes('sudo') || shortcutText.includes('pacman') || shortcutText.includes('apt')) {
+    if (
+      shortcutText.includes('sudo') ||
+      shortcutText.includes('pacman') ||
+      shortcutText.includes('apt')
+    ) {
       return (
         <div className="bg-slate-900 text-green-400 p-2 rounded font-mono text-sm mb-2">
           {shortcutText}
@@ -60,7 +68,7 @@ export default function ShortcutCard({ shortcut, categoryColor, searchTerm }: Sh
     }
 
     const keys = shortcutText.split(/[\+\s]+/).filter(Boolean);
-    
+
     return (
       <div className="flex items-center space-x-1 mb-2 flex-wrap">
         {keys.map((key, index) => (
@@ -87,12 +95,14 @@ export default function ShortcutCard({ shortcut, categoryColor, searchTerm }: Sh
             size="sm"
             onClick={() => toggleFavorite(shortcut.id)}
             className={`p-1 h-auto ${
-              isFavorite(shortcut.id) 
-                ? 'text-red-500 hover:text-red-600' 
+              isFavorite(shortcut.id)
+                ? 'text-red-500 hover:text-red-600'
                 : 'text-slate-400 dark:text-gray-400 hover:text-red-500'
             }`}
           >
-            <Heart className={`h-4 w-4 ${isFavorite(shortcut.id) ? 'fill-current' : ''}`} />
+            <Heart
+              className={`h-4 w-4 ${isFavorite(shortcut.id) ? 'fill-current' : ''}`}
+            />
           </Button>
           <Button
             variant="ghost"
@@ -100,7 +110,11 @@ export default function ShortcutCard({ shortcut, categoryColor, searchTerm }: Sh
             onClick={handleCopy}
             className="text-slate-400 dark:text-gray-400 hover:text-primary p-1 h-auto"
           >
-            {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+            {copied ? (
+              <Check className="h-4 w-4" />
+            ) : (
+              <Copy className="h-4 w-4" />
+            )}
           </Button>
         </div>
       </div>
@@ -111,7 +125,9 @@ export default function ShortcutCard({ shortcut, categoryColor, searchTerm }: Sh
         {highlightText(shortcut.description, searchTerm)}
       </p>
 
-      <span className={`inline-block px-2 py-1 text-xs rounded-full capitalize ${categoryColor}`}>
+      <span
+        className={`inline-block px-2 py-1 text-xs rounded-full capitalize ${categoryColor}`}
+      >
         {shortcut.category}
       </span>
     </div>

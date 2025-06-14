@@ -1,15 +1,17 @@
-import { Search, Moon, Sun, Database } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { useTheme } from "@/contexts/ThemeContext";
-import { Link } from "wouter";
+import { Moon, Search, Sun } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface SearchHeaderProps {
   searchTerm: string;
   onSearchChange: (value: string) => void;
 }
 
-export default function SearchHeader({ searchTerm, onSearchChange }: SearchHeaderProps) {
+export default function SearchHeader({
+  searchTerm,
+  onSearchChange,
+}: SearchHeaderProps) {
   const { theme, toggleTheme } = useTheme();
 
   return (
@@ -19,7 +21,9 @@ export default function SearchHeader({ searchTerm, onSearchChange }: SearchHeade
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
               <i className="fas fa-keyboard text-2xl text-primary"></i>
-              <h1 className="text-xl font-bold text-slate-900 dark:text-white">Shortcuts Hub</h1>
+              <h1 className="text-xl font-bold text-slate-900 dark:text-white">
+                Shortcuts Hub
+              </h1>
             </div>
           </div>
 
@@ -38,32 +42,29 @@ export default function SearchHeader({ searchTerm, onSearchChange }: SearchHeade
           </div>
 
           <div className="flex items-center space-x-4">
-            <Link href="/firebase-admin">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-slate-600 dark:text-gray-300 hover:text-slate-900 dark:hover:text-white"
-              >
-                <Database className="h-4 w-4 mr-1" />
-                <span className="hidden md:inline">Firebase Admin</span>
-              </Button>
-            </Link>
-
             <Button
               variant="ghost"
               size="sm"
               onClick={toggleTheme}
               className="text-slate-600 dark:text-gray-300 hover:text-slate-900 dark:hover:text-white"
             >
-              {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              {theme === 'dark' ? (
+                <Sun className="h-4 w-4" />
+              ) : (
+                <Moon className="h-4 w-4" />
+              )}
             </Button>
 
             <div className="flex items-center space-x-2">
-              <span className="text-sm text-slate-500 dark:text-gray-400 hidden sm:block">Press</span>
+              <span className="text-sm text-slate-500 dark:text-gray-400 hidden sm:block">
+                Press
+              </span>
               <kbd className="px-2 py-1 text-xs font-semibold text-slate-500 dark:text-gray-400 bg-slate-100 dark:bg-gray-800 border border-slate-300 dark:border-gray-600 rounded hidden sm:inline-block">
                 Ctrl+K
               </kbd>
-              <span className="text-sm text-slate-500 dark:text-gray-400 hidden sm:block">to search</span>
+              <span className="text-sm text-slate-500 dark:text-gray-400 hidden sm:block">
+                to search
+              </span>
             </div>
           </div>
         </div>

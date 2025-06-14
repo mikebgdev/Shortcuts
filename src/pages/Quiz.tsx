@@ -1,15 +1,32 @@
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { Trophy, RotateCcw, ArrowLeft, Clock, CheckCircle, XCircle } from "lucide-react";
-import { getShortcuts, getQuizHistory, createQuizSession } from "@/lib/firebase";
+import { useEffect, useState } from 'react';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
+import {
+  ArrowLeft,
+  CheckCircle,
+  Clock,
+  RotateCcw,
+  Trophy,
+  XCircle,
+} from 'lucide-react';
+import {
+  createQuizSession,
+  getQuizHistory,
+  getShortcuts,
+} from '@/lib/firebase';
 import { useToast } from '@/contexts/ToastContext';
-import { Link } from "wouter";
-import type { Shortcut, QuizSession } from "@/lib/types";
+import { Link } from 'wouter';
+import type { QuizSession, Shortcut } from '@/lib/types';
 
 interface QuizQuestion {
   shortcut: Shortcut;
@@ -18,23 +35,20 @@ interface QuizQuestion {
 }
 
 export default function QuizPage() {
-  const [selectedPlatform, setSelectedPlatform] = useState<string>("");
+  const [selectedPlatform, setSelectedPlatform] = useState<string>('');
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState("");
+  const [selectedAnswer, setSelectedAnswer] = useState('');
   const [userAnswers, setUserAnswers] = useState<string[]>([]);
   const [quizStarted, setQuizStarted] = useState(false);
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [score, setScore] = useState(0);
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
-  const [timeLeft, setTimeLeft] = useState(300); // 5 minutes
+  const [timeLeft, setTimeLeft] = useState(300);
   const [timerActive, setTimerActive] = useState(false);
   const { toast } = useToast();
-  const userId = 1; // Demo user
+  const userId = 1;
   const [shortcuts, setShortcuts] = useState<Shortcut[]>([]);
   const [quizHistory, setQuizHistory] = useState<QuizSession[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-
-  // Fetch shortcuts
   useEffect(() => {
     const fetchShortcuts = async () => {
       try {
@@ -48,7 +62,6 @@ export default function QuizPage() {
     fetchShortcuts();
   }, []);
 
-  // Fetch quiz history
   useEffect(() => {
     const fetchQuizHistory = async () => {
       try {
@@ -61,39 +74,38 @@ export default function QuizPage() {
 
     fetchQuizHistory();
   }, [userId]);
-
-  // Save quiz session
-  const saveQuizSession = async (sessionData: { userId: number; platform: string; score: number; totalQuestions: number; completedAt: string }) => {
-    setIsLoading(true);
+  const saveQuizSession = async (sessionData: {
+    userId: number;
+    platform: string;
+    score: number;
+    totalQuestions: number;
+    completedAt: string;
+  }) => {
     try {
       await createQuizSession(
         sessionData.userId,
         sessionData.platform,
         sessionData.score,
         sessionData.totalQuestions,
-        sessionData.completedAt
+        sessionData.completedAt,
       );
 
-      // Refresh quiz history
       const updatedHistory = await getQuizHistory(userId);
       setQuizHistory(updatedHistory);
 
       toast({
-        title: "Quiz completado",
-        description: "Tu puntuación ha sido guardada.",
+        title: 'Quiz completado',
+        description: 'Tu puntuación ha sido guardada.',
       });
     } catch (error) {
       console.error('Error saving quiz session:', error);
       toast({
-        title: "Error",
-        description: "No se pudo guardar la puntuación.",
+        title: 'Error',
+        description: 'No se pudo guardar la puntuación.',
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 
-  // Timer effect
   useEffect(() => {
     if (timerActive && timeLeft > 0) {
       const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
@@ -106,27 +118,34 @@ export default function QuizPage() {
   const platforms = [
     { id: 'phpstorm', name: 'PHPStorm', color: '#9333ea' },
     { id: 'archlinux', name: 'ArchLinux', color: '#1677ff' },
-    { id: 'ubuntu', name: 'Ubuntu', color: '#e97317' }
+    { id: 'ubuntu', name: 'Ubuntu', color: '#e97317' },
   ];
 
-  const generateRandomOptions = (correctAnswer: string, allShortcuts: Shortcut[]): string[] => {
+  const generateRandomOptions = (
+    correctAnswer: string,
+    allShortcuts: Shortcut[],
+  ): string[] => {
     const wrongAnswers = allShortcuts
-      .filter(s => s.shortcut !== correctAnswer)
-      .map(s => s.shortcut)
+      .filter((s) => s.shortcut !== correctAnswer)
+      .map((s) => s.shortcut)
       .sort(() => 0.5 - Math.random())
       .slice(0, 3);
 
-    const options = [correctAnswer, ...wrongAnswers].sort(() => 0.5 - Math.random());
+    const options = [correctAnswer, ...wrongAnswers].sort(
+      () => 0.5 - Math.random(),
+    );
     return options;
   };
 
   const startQuiz = (platform: string) => {
-    const platformShortcuts = shortcuts.filter((s: Shortcut) => s.platform === platform);
+    const platformShortcuts = shortcuts.filter(
+      (s: Shortcut) => s.platform === platform,
+    );
 
     if (platformShortcuts.length < 10) {
       toast({
-        title: "Insuficientes shortcuts",
-        description: "Se necesitan al menos 10 shortcuts para crear un quiz.",
+        title: 'Insuficientes shortcuts',
+        description: 'Se necesitan al menos 10 shortcuts para crear un quiz.',
       });
       return;
     }
@@ -135,10 +154,10 @@ export default function QuizPage() {
       .sort(() => 0.5 - Math.random())
       .slice(0, 10);
 
-    const quizQuestions: QuizQuestion[] = selectedShortcuts.map(shortcut => ({
+    const quizQuestions: QuizQuestion[] = selectedShortcuts.map((shortcut) => ({
       shortcut,
       options: generateRandomOptions(shortcut.shortcut, platformShortcuts),
-      correctAnswer: shortcut.shortcut
+      correctAnswer: shortcut.shortcut,
     }));
 
     setQuestions(quizQuestions);
@@ -147,7 +166,7 @@ export default function QuizPage() {
     setQuizCompleted(false);
     setCurrentQuestion(0);
     setUserAnswers([]);
-    setSelectedAnswer("");
+    setSelectedAnswer('');
     setScore(0);
     setTimeLeft(300);
     setTimerActive(true);
@@ -165,7 +184,7 @@ export default function QuizPage() {
 
     if (currentQuestion + 1 < questions.length) {
       setCurrentQuestion(currentQuestion + 1);
-      setSelectedAnswer("");
+      setSelectedAnswer('');
     } else {
       handleQuizComplete();
     }
@@ -175,8 +194,8 @@ export default function QuizPage() {
     setTimerActive(false);
     setQuizCompleted(true);
 
-    const finalScore = userAnswers.filter((answer, index) => 
-      answer === questions[index]?.correctAnswer
+    const finalScore = userAnswers.filter(
+      (answer, index) => answer === questions[index]?.correctAnswer,
     ).length;
 
     saveQuizSession({
@@ -184,17 +203,17 @@ export default function QuizPage() {
       platform: selectedPlatform,
       score: finalScore,
       totalQuestions: questions.length,
-      completedAt: new Date().toISOString()
+      completedAt: new Date().toISOString(),
     });
   };
 
   const resetQuiz = () => {
     setQuizStarted(false);
     setQuizCompleted(false);
-    setSelectedPlatform("");
+    setSelectedPlatform('');
     setCurrentQuestion(0);
     setUserAnswers([]);
-    setSelectedAnswer("");
+    setSelectedAnswer('');
     setScore(0);
     setTimerActive(false);
     setTimeLeft(300);
@@ -208,9 +227,9 @@ export default function QuizPage() {
 
   const getScoreColor = (score: number, total: number) => {
     const percentage = (score / total) * 100;
-    if (percentage >= 80) return "text-green-600";
-    if (percentage >= 60) return "text-yellow-600";
-    return "text-red-600";
+    if (percentage >= 80) return 'text-green-600';
+    if (percentage >= 60) return 'text-yellow-600';
+    return 'text-red-600';
   };
 
   if (!quizStarted) {
@@ -220,30 +239,38 @@ export default function QuizPage() {
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold mb-2">Modo Práctica</h1>
             <p className="text-gray-600 dark:text-gray-400">
-              Pon a prueba tu conocimiento de shortcuts con nuestro quiz interactivo
+              Pon a prueba tu conocimiento de shortcuts con nuestro quiz
+              interactivo
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <h2 className="text-xl font-semibold mb-4">Selecciona una plataforma</h2>
+              <h2 className="text-xl font-semibold mb-4">
+                Selecciona una plataforma
+              </h2>
               <div className="space-y-3">
                 {platforms.map((platform) => (
-                  <Card 
-                    key={platform.id} 
+                  <Card
+                    key={platform.id}
                     className="cursor-pointer hover:shadow-md transition-shadow"
                     onClick={() => startQuiz(platform.id)}
                   >
                     <CardHeader className="pb-3">
                       <CardTitle className="flex items-center gap-3">
-                        <div 
+                        <div
                           className="w-4 h-4 rounded-full"
                           style={{ backgroundColor: platform.color }}
                         />
                         {platform.name}
                       </CardTitle>
                       <CardDescription>
-                        {shortcuts.filter((s: Shortcut) => s.platform === platform.id).length} shortcuts disponibles
+                        {
+                          shortcuts.filter(
+                            (s: Shortcut) => s.platform === platform.id,
+                          ).length
+                        }{' '}
+                        shortcuts disponibles
                       </CardDescription>
                     </CardHeader>
                   </Card>
@@ -264,15 +291,22 @@ export default function QuizPage() {
                               {session.platform}
                             </Badge>
                             <p className="text-sm text-gray-600 dark:text-gray-400">
-                              {new Date(session.completedAt).toLocaleDateString()}
+                              {new Date(
+                                session.completedAt,
+                              ).toLocaleDateString()}
                             </p>
                           </div>
                           <div className="text-right">
-                            <p className={`font-semibold ${getScoreColor(session.score, session.totalQuestions)}`}>
+                            <p
+                              className={`font-semibold ${getScoreColor(session.score, session.totalQuestions)}`}
+                            >
                               {session.score}/{session.totalQuestions}
                             </p>
                             <p className="text-sm text-gray-500">
-                              {Math.round((session.score / session.totalQuestions) * 100)}%
+                              {Math.round(
+                                (session.score / session.totalQuestions) * 100,
+                              )}
+                              %
                             </p>
                           </div>
                         </div>
@@ -302,8 +336,8 @@ export default function QuizPage() {
   }
 
   if (quizCompleted) {
-    const finalScore = userAnswers.filter((answer, index) => 
-      answer === questions[index]?.correctAnswer
+    const finalScore = userAnswers.filter(
+      (answer, index) => answer === questions[index]?.correctAnswer,
     ).length;
     const percentage = Math.round((finalScore / questions.length) * 100);
 
@@ -337,25 +371,38 @@ export default function QuizPage() {
               const isCorrect = userAnswer === question.correctAnswer;
 
               return (
-                <Card key={index} className={`border-l-4 ${isCorrect ? 'border-green-500' : 'border-red-500'}`}>
+                <Card
+                  key={index}
+                  className={`border-l-4 ${isCorrect ? 'border-green-500' : 'border-red-500'}`}
+                >
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <p className="font-medium mb-1">{question.shortcut.title}</p>
+                        <p className="font-medium mb-1">
+                          {question.shortcut.title}
+                        </p>
                         <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
                           {question.shortcut.description}
                         </p>
                         <div className="space-y-1">
                           <p className="text-sm">
-                            <span className="font-medium">Tu respuesta:</span> 
-                            <span className={isCorrect ? 'text-green-600' : 'text-red-600'}>
+                            <span className="font-medium">Tu respuesta:</span>
+                            <span
+                              className={
+                                isCorrect ? 'text-green-600' : 'text-red-600'
+                              }
+                            >
                               {userAnswer || 'Sin respuesta'}
                             </span>
                           </p>
                           {!isCorrect && (
                             <p className="text-sm">
-                              <span className="font-medium">Respuesta correcta:</span> 
-                              <span className="text-green-600">{question.correctAnswer}</span>
+                              <span className="font-medium">
+                                Respuesta correcta:
+                              </span>
+                              <span className="text-green-600">
+                                {question.correctAnswer}
+                              </span>
                             </p>
                           )}
                         </div>
@@ -406,7 +453,10 @@ export default function QuizPage() {
               <Clock className="w-4 h-4" />
               {formatTime(timeLeft)}
             </div>
-            <Progress value={((currentQuestion) / questions.length) * 100} className="w-32" />
+            <Progress
+              value={(currentQuestion / questions.length) * 100}
+              className="w-32"
+            />
           </div>
         </div>
 
@@ -424,11 +474,14 @@ export default function QuizPage() {
               <h3 className="text-lg font-medium mb-4">
                 ¿Cuál es el shortcut correcto?
               </h3>
-              <RadioGroup value={selectedAnswer} onValueChange={setSelectedAnswer}>
+              <RadioGroup
+                value={selectedAnswer}
+                onValueChange={setSelectedAnswer}
+              >
                 {questions[currentQuestion]?.options.map((option, index) => (
                   <div key={index} className="flex items-center space-x-2">
                     <RadioGroupItem value={option} id={`option-${index}`} />
-                    <Label 
+                    <Label
                       htmlFor={`option-${index}`}
                       className="font-mono text-sm cursor-pointer flex-1 p-2 rounded hover:bg-gray-50 dark:hover:bg-gray-800"
                     >
@@ -443,11 +496,10 @@ export default function QuizPage() {
               <Button variant="outline" onClick={resetQuiz}>
                 Cancelar Quiz
               </Button>
-              <Button 
-                onClick={handleAnswerSubmit}
-                disabled={!selectedAnswer}
-              >
-                {currentQuestion + 1 === questions.length ? 'Finalizar' : 'Siguiente'}
+              <Button onClick={handleAnswerSubmit} disabled={!selectedAnswer}>
+                {currentQuestion + 1 === questions.length
+                  ? 'Finalizar'
+                  : 'Siguiente'}
               </Button>
             </div>
           </CardContent>

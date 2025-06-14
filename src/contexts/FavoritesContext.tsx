@@ -1,5 +1,5 @@
-import { createContext, useContext, useState, useEffect } from 'react';
-import { getFavorites, addFavorite, removeFavorite } from '@/lib/firebase';
+import { createContext, useContext, useEffect, useState } from 'react';
+import { addFavorite, getFavorites, removeFavorite } from '@/lib/firebase';
 
 interface FavoritesContextType {
   favorites: string[];
@@ -8,9 +8,10 @@ interface FavoritesContextType {
   isLoading: boolean;
 }
 
-const FavoritesContext = createContext<FavoritesContextType | undefined>(undefined);
+const FavoritesContext = createContext<FavoritesContextType | undefined>(
+  undefined,
+);
 
-// For now, using a fixed user ID since we don't have authentication
 const CURRENT_USER_ID = 1;
 
 export function FavoritesProvider({ children }: { children: React.ReactNode }) {
@@ -18,7 +19,6 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isPending, setIsPending] = useState(false);
 
-  // Fetch favorites
   useEffect(() => {
     const fetchFavorites = async () => {
       setIsLoading(true);
@@ -35,34 +35,28 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
     fetchFavorites();
   }, []);
 
-  // Add favorite
   const handleAddFavorite = async (shortcutId: string) => {
     setIsPending(true);
 
-    // Optimistically update
-    setFavorites(prev => [...prev, shortcutId]);
+    setFavorites((prev) => [...prev, shortcutId]);
 
     try {
       await addFavorite(CURRENT_USER_ID, shortcutId);
     } catch (error) {
       console.error('Error adding favorite:', error);
 
-      // Rollback on error
-      setFavorites(prev => prev.filter(id => id !== shortcutId));
+      setFavorites((prev) => prev.filter((id) => id !== shortcutId));
     } finally {
       setIsPending(false);
     }
   };
 
-  // Remove favorite
   const handleRemoveFavorite = async (shortcutId: string) => {
     setIsPending(true);
 
-    // Store previous state for rollback
     const previousFavorites = [...favorites];
 
-    // Optimistically update
-    setFavorites(prev => prev.filter(id => id !== shortcutId));
+    setFavorites((prev) => prev.filter((id) => id !== shortcutId));
 
     try {
       await removeFavorite(CURRENT_USER_ID, shortcutId);
@@ -77,7 +71,6 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
   };
 
   const toggleFavorite = (shortcutId: string) => {
-    // Prevent multiple clicks while operation is pending
     if (isPending) {
       return;
     }
@@ -94,12 +87,14 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <FavoritesContext.Provider value={{
-      favorites,
-      toggleFavorite,
-      isFavorite,
-      isLoading: isLoading || isPending,
-    }}>
+    <FavoritesContext.Provider
+      value={{
+        favorites,
+        toggleFavorite,
+        isFavorite,
+        isLoading: isLoading || isPending,
+      }}
+    >
       {children}
     </FavoritesContext.Provider>
   );
