@@ -13,7 +13,10 @@ import { Link } from "wouter";
 const PLATFORMS = [
   { id: "phpstorm", name: "PHPStorm", icon: "fab fa-php" },
   { id: "archlinux", name: "Arch Linux", icon: "fab fa-linux" },
-  { id: "ubuntu", name: "Ubuntu", icon: "fab fa-ubuntu" }
+  { id: "ubuntu", name: "Ubuntu", icon: "fab fa-ubuntu" },
+  { id: "git", name: "Git", icon: "fab fa-git-alt" },
+  { id: "docker", name: "Docker", icon: "fab fa-docker" },
+  { id: "vim", name: "Vim", icon: "fas fa-terminal" }
 ];
 
 const CATEGORIES = [
@@ -25,7 +28,7 @@ const CATEGORIES = [
 ];
 
 export default function ShortcutsPage() {
-  const [activePlatform, setActivePlatform] = useState("phpstorm");
+  const [activePlatform, setActivePlatform] = useState("git");
   const [searchTerm, setSearchTerm] = useState("");
   const [activeCategories, setActiveCategories] = useState(
     CATEGORIES.map(cat => cat.id)

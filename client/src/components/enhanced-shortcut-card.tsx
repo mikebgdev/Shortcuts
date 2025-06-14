@@ -19,16 +19,16 @@ interface EnhancedShortcutCardProps {
   viewMode?: 'compact' | 'expanded';
 }
 
-// Helper function for category colors
+// Helper function for animated category colors
 const getCategoryColorClass = (category: string) => {
   const colorMap = {
-    'navigation': 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
-    'editing': 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
-    'debugging': 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
-    'system': 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
-    'window': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'
+    'navigation': 'bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 dark:from-blue-900/30 dark:to-blue-800/30 dark:text-blue-300 hover:from-blue-200 hover:to-blue-300 dark:hover:from-blue-800/40 dark:hover:to-blue-700/40 transition-all duration-300 animate-pulse',
+    'editing': 'bg-gradient-to-r from-green-100 to-green-200 text-green-800 dark:from-green-900/30 dark:to-green-800/30 dark:text-green-300 hover:from-green-200 hover:to-green-300 dark:hover:from-green-800/40 dark:hover:to-green-700/40 transition-all duration-300 animate-pulse',
+    'debugging': 'bg-gradient-to-r from-red-100 to-red-200 text-red-800 dark:from-red-900/30 dark:to-red-800/30 dark:text-red-300 hover:from-red-200 hover:to-red-300 dark:hover:from-red-800/40 dark:hover:to-red-700/40 transition-all duration-300 animate-pulse',
+    'system': 'bg-gradient-to-r from-purple-100 to-purple-200 text-purple-800 dark:from-purple-900/30 dark:to-purple-800/30 dark:text-purple-300 hover:from-purple-200 hover:to-purple-300 dark:hover:from-purple-800/40 dark:hover:to-purple-700/40 transition-all duration-300 animate-pulse',
+    'window': 'bg-gradient-to-r from-yellow-100 to-yellow-200 text-yellow-800 dark:from-yellow-900/30 dark:to-yellow-800/30 dark:text-yellow-300 hover:from-yellow-200 hover:to-yellow-300 dark:hover:from-yellow-800/40 dark:hover:to-yellow-700/40 transition-all duration-300 animate-pulse'
   };
-  return colorMap[category as keyof typeof colorMap] || 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300';
+  return colorMap[category as keyof typeof colorMap] || 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800 dark:from-gray-900/30 dark:to-gray-800/30 dark:text-gray-300 hover:from-gray-200 hover:to-gray-300 transition-all duration-300';
 };
 
 export default function EnhancedShortcutCard({ shortcut, categoryColor, searchTerm, viewMode = 'compact' }: EnhancedShortcutCardProps) {
