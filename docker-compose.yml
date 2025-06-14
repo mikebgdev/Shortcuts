@@ -1,0 +1,10 @@
+version: '3.9'
+
+services:
+  shortcuts:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: react-${PROJECT_NAME}
+    ports:
+      - ${HTTP_PORT}:80

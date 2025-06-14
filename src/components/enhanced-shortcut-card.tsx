@@ -7,10 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Copy, Heart, Check, StickyNote, Tag, Plus, X } from "lucide-react";
 import { useFavorites } from "@/contexts/FavoritesContext";
-import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
-import type { Shortcut, UserNote, Tag as TagType } from "@shared/schema";
 
 interface EnhancedShortcutCardProps {
   shortcut: Shortcut;

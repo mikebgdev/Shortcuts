@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import type { Shortcut } from "@shared/schema";
 import SearchHeader from "@/components/search-header";
 import PlatformSidebar from "@/components/platform-sidebar";
 
