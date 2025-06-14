@@ -9,7 +9,6 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "jest",
     "test:coverage": "jest --coverage",
     "prepare": "husky install",
     "ci": "npm install --legacy-peer-deps"

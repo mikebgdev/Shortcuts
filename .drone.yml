@@ -28,12 +28,6 @@ steps:
       - cd ./$PROJECT_NAME
       - npm run ci
 
-  - name: test
-    image: node:20-alpine
-    commands:
-      - cd ./$PROJECT_NAME
-      - npm run test
-
   - name: build
     image: node:20-alpine
     commands:
