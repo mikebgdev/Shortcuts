@@ -52,6 +52,6 @@ export interface QuizSession {
   platform: string;
   score: number;
   totalQuestions: number;
-  completedAt: Timestamp;
+  completedAt: string;
   createdAt: Timestamp;
 }

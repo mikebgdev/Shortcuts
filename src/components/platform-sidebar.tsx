@@ -6,7 +6,7 @@ import { Category, Platform } from '@/lib/types';
 interface PlatformSidebarProps {
   platforms: Platform[];
   categories: Category[];
-  activePlatform: Platform;
+  activePlatform: Platform|undefined;
   activeCategories: Category[];
   onPlatformChange: (platform: Platform) => void;
   onCategoryToggle: (category: Category) => void;
@@ -32,7 +32,7 @@ export default function PlatformSidebar({
           {platforms.map((platform: Platform) => (
             <Button
               key={platform.id}
-              variant={activePlatform.id === platform.id ? 'default' : 'ghost'}
+              variant={activePlatform?.id === platform.id ? 'default' : 'ghost'}
               className="w-full justify-start font-medium text-slate-700 dark:text-gray-300 hover:text-slate-900 dark:hover:text-white group transition-all duration-300 hover:scale-105 hover:shadow-md"
               onClick={() => onPlatformChange(platform)}
             >
@@ -81,7 +81,7 @@ export default function PlatformSidebar({
         </CardHeader>
         <CardContent>
           <div className="space-y-2 text-sm text-blue-800 dark:text-blue-300">
-            {activePlatform.originalId === 'git' && (
+            {activePlatform?.originalId === 'git' && (
               <div className="animate-fade-in">
                 <p className="font-medium">💡 Git Workflow:</p>
                 <p>
@@ -93,7 +93,7 @@ export default function PlatformSidebar({
                 </p>
               </div>
             )}
-            {activePlatform.originalId === 'docker' && (
+            {activePlatform?.originalId === 'docker' && (
               <div className="animate-fade-in">
                 <p className="font-medium">🐳 Docker Tips:</p>
                 <p>
@@ -105,7 +105,7 @@ export default function PlatformSidebar({
                 </p>
               </div>
             )}
-            {activePlatform.originalId === 'vim' && (
+            {activePlatform?.originalId === 'vim' && (
               <div className="animate-fade-in">
                 <p className="font-medium">⌨️ Vim Basics:</p>
                 <p>
@@ -121,7 +121,7 @@ export default function PlatformSidebar({
                 </p>
               </div>
             )}
-            {activePlatform.originalId === 'phpstorm' && (
+            {activePlatform?.originalId === 'phpstorm' && (
               <div className="animate-fade-in">
                 <p className="font-medium">🚀 PHPStorm Pro:</p>
                 <p>
@@ -133,8 +133,8 @@ export default function PlatformSidebar({
                 </p>
               </div>
             )}
-            {(activePlatform.originalId === 'archlinux' ||
-              activePlatform.originalId === 'ubuntu') && (
+            {(activePlatform?.originalId === 'archlinux' ||
+              activePlatform?.originalId === 'ubuntu') && (
               <div className="animate-fade-in">
                 <p className="font-medium">🐧 Linux Power:</p>
                 <p>

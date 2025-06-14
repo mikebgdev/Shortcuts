@@ -3,13 +3,11 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "license": "MIT",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test:coverage": "jest --coverage",
     "prepare": "husky install",
     "ci": "npm install --legacy-peer-deps"
   },

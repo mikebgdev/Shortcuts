@@ -15,7 +15,7 @@ export default function ShortcutsPage() {
   const [platforms, setPlatforms] = useState<Platform[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [activeCategories, setActiveCategories] = useState<Category[]>([]);
-  const [activePlatform, setActivePlatform] = useState<Platform>('');
+  const [activePlatform, setActivePlatform] = useState<Platform|undefined>();
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [shortcuts, setShortcuts] = useState<Shortcut[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -137,8 +137,9 @@ export default function ShortcutsPage() {
   };
 
   const currentPlatform = platforms.find(
-    (p) => p.originalId === activePlatform.originalId,
+      (p) => p.originalId === activePlatform?.originalId,
   );
+
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-gray-900">

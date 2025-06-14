@@ -14,18 +14,11 @@ import {
   updateDoc,
   where,
 } from 'firebase/firestore';
-import type { Category, InsertPlatform, Platform, Shortcut } from '@/lib/types';
+import type {Category, InsertPlatform, Platform, QuizSession, Shortcut, UserNote} from '@/lib/types';
 import { firebaseConfig } from './env';
 
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
-
-export async function addPlatform(
-  data: Omit<InsertPlatform, 'id'>,
-): Promise<string> {
-  const ref = await addDoc(collection(db, 'platforms'), data);
-  return ref.id;
-}
 
 export async function getPlatforms(): Promise<Platform[]> {
   const platformsCollection = collection(db, 'platforms');
@@ -34,15 +27,6 @@ export async function getPlatforms(): Promise<Platform[]> {
     id: doc.id,
     ...(doc.data() as Omit<Platform, 'id'>),
   }));
-}
-
-export async function getPlatform(id: string) {
-  const docRef = doc(db, 'platforms', id);
-  const snapshot = await getDoc(docRef);
-  if (snapshot.exists()) {
-    return { id: snapshot.id, ...snapshot.data() };
-  }
-  return null;
 }
 
 export async function getCategories(): Promise<Category[]> {
@@ -63,33 +47,6 @@ export async function getShortcuts(): Promise<Shortcut[]> {
   }));
 }
 
-export async function getShortcutsByPlatform(platform: string) {
-  const shortcutsCollection = collection(db, 'shortcuts');
-  const q = query(shortcutsCollection, where('platform', '==', platform));
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-}
-
-export async function getShortcutsByCategory(category: string) {
-  const shortcutsCollection = collection(db, 'shortcuts');
-  const q = query(shortcutsCollection, where('category', '==', category));
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-}
-
-export async function searchShortcuts(query: string) {
-  const shortcutsCollection = collection(db, 'shortcuts');
-  const snapshot = await getDocs(shortcutsCollection);
-  const shortcuts = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-
-  const searchTerm = query.toLowerCase();
-  return shortcuts.filter(
-    (shortcut: Shortcut) =>
-      shortcut.shortcut.toLowerCase().includes(searchTerm) ||
-      shortcut.description.toLowerCase().includes(searchTerm) ||
-      shortcut.title.toLowerCase().includes(searchTerm),
-  );
-}
 
 export async function getFavorites(userId: number) {
   const favoritesCollection = collection(db, 'favorites');
@@ -138,7 +95,7 @@ export async function removeFavorite(userId: number, shortcutId: string) {
   return { success: true };
 }
 
-export async function getUserNote(userId: number, shortcutId: string) {
+export async function getUserNote(userId: number, shortcutId: string): Promise<UserNote|null> {
   const notesCollection = collection(db, 'notes');
   const q = query(
     notesCollection,
@@ -151,7 +108,10 @@ export async function getUserNote(userId: number, shortcutId: string) {
     return null;
   }
 
-  return { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
+  return {
+    id: snapshot.docs[0].id,
+    ...(snapshot.docs[0].data() as Omit<UserNote, 'id'>),
+  };
 }
 
 export async function createUserNote(
@@ -227,7 +187,7 @@ export async function deleteUserNote(userId: number, shortcutId: string) {
   return { success: true };
 }
 
-export async function getQuizHistory(userId: number) {
+export async function getQuizHistory(userId: number): Promise<QuizSession[]> {
   const quizSessionsCollection = collection(db, 'quizSessions');
 
   const q = query(
@@ -238,7 +198,10 @@ export async function getQuizHistory(userId: number) {
   );
   const snapshot = await getDocs(q);
 
-  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  return snapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...(doc.data() as Omit<QuizSession, 'id'>),
+  }));
 }
 
 export async function createQuizSession(
