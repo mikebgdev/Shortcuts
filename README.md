@@ -39,7 +39,7 @@
 1. Clone the repository:
    ```bash
    git clone https://github.com/mikebgdev/Shortcuts.git
-   cd shortcuts
+   cd Shortcuts
    ```
 
 2. Install dependencies and set up Git hooks:
@@ -65,9 +65,14 @@
 
 4. Run in development mode:
    ```bash
-   npm run dev
-   ```
-   The application will be available at `http://localhost:5173`.
+    npm run dev
+    ```
+    The application will be available at `http://localhost:5173`.
+
+5. (Optional) Initialize Firestore with sample data:
+   1. Start the development server.
+   2. Open `http://localhost:5173/firebase-admin` in your browser.
+   3. Click **Initialize Firestore** to populate the database.
 
 ## Useful Scripts
 
@@ -77,6 +82,7 @@
 - `npm run lint` — Run ESLint.
 - `npm run prepare` — Set up Git hooks (Husky + lint-staged; run once after cloning)
 - `npm run ci` — Install dependencies for CI (with legacy peer deps)
+- `npm test` — Run tests.
 
 ## Project Structure
 

@@ -27,6 +27,7 @@ import {
 import { useToast } from '@/contexts/ToastContext';
 import { Link } from 'wouter';
 import type { QuizSession, Shortcut } from '@/lib/types';
+import { demoUserId } from '@/lib/env';
 
 interface QuizQuestion {
   shortcut: Shortcut;
@@ -46,7 +47,7 @@ export default function QuizPage() {
   const [timeLeft, setTimeLeft] = useState(300);
   const [timerActive, setTimerActive] = useState(false);
   const { toast } = useToast();
-  const userId = 1;
+  const userId = demoUserId;
   const [shortcuts, setShortcuts] = useState<Shortcut[]>([]);
   const [quizHistory, setQuizHistory] = useState<QuizSession[]>([]);
   useEffect(() => {

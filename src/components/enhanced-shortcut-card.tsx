@@ -27,6 +27,7 @@ import {
 } from '@/lib/firebase';
 import { useToast } from '@/contexts/ToastContext';
 import type { Shortcut, UserNote } from '@/lib/types';
+import { demoUserId } from '@/lib/env';
 
 interface EnhancedShortcutCardProps {
   shortcut: Shortcut;
@@ -65,7 +66,7 @@ export default function EnhancedShortcutCard({
   const { toggleFavorite, isFavorite } = useFavorites();
   const { toast } = useToast();
   const favorite = isFavorite(shortcut.id);
-  const userId = 1; // Using demo user
+  const userId = demoUserId;
   const [userNote, setUserNote] = useState<UserNote | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 

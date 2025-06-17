@@ -12,7 +12,9 @@ const FavoritesContext = createContext<FavoritesContextType | undefined>(
   undefined,
 );
 
-const CURRENT_USER_ID = 1;
+import { demoUserId } from '@/lib/env';
+
+const CURRENT_USER_ID = demoUserId;
 
 export function FavoritesProvider({ children }: { children: React.ReactNode }) {
   const [favorites, setFavorites] = useState<string[]>([]);
