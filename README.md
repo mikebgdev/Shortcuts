@@ -39,7 +39,7 @@
 1. Clone the repository:
    ```bash
    git clone https://github.com/mikebgdev/Shortcuts.git
-   cd shortcuts
+   cd Shortcuts
    ```
 
 2. Install dependencies and set up Git hooks:
@@ -74,6 +74,7 @@
 - `npm run lint` — Run ESLint.
 - `npm run prepare` — Set up Git hooks (Husky + lint-staged; run once after cloning)
 - `npm run ci` — Install dependencies for CI (with legacy peer deps)
+- `npm test` — Run tests.
 
 ## Project Structure
 
