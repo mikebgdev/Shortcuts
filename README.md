@@ -61,7 +61,7 @@
    # ID of the demo user used for local testing
    VITE_DEMO_USER_ID=...
    ```
-   The `VITE_DEMO_USER_ID` value determines the default user for local testing and can be changed to try a different demo account.
+   The `VITE_DEMO_USER_ID` value sets the default user for local testing. Change it to use a different demo account.
 
 4. Run in development mode:
    ```bash
