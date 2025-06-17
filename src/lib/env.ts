@@ -5,3 +5,5 @@ export const firebaseConfig = {
   storageBucket: `${import.meta.env.VITE_FIREBASE_PROJECT_ID}.appspot.com`,
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
+
+export const demoUserId = Number(import.meta.env.VITE_DEMO_USER_ID) || 1;

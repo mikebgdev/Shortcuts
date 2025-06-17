@@ -56,15 +56,21 @@
    Edit `.env.local` with:
    ```ini
    VITE_FIREBASE_API_KEY=...
-   VITE_FIREBASE_PROJECT_ID=...
-   VITE_FIREBASE_APP_ID=...
-   ```
+    VITE_FIREBASE_PROJECT_ID=...
+    VITE_FIREBASE_APP_ID=...
+    VITE_DEMO_USER_ID=1
+    ```
 
 4. Run in development mode:
    ```bash
-   npm run dev
-   ```
-   The application will be available at `http://localhost:5173`.
+    npm run dev
+    ```
+    The application will be available at `http://localhost:5173`.
+
+5. (Optional) Initialize Firestore with sample data:
+   1. Start the development server.
+   2. Open `http://localhost:5173/firebase-admin` in your browser.
+   3. Click **Initialize Firestore** to populate the database.
 
 ## Useful Scripts
 
